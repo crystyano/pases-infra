@@ -1,0 +1,12 @@
+name: pases-webui
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PORT=3000
+      - OLLAMA_BASE_URL=http://127.0.0.1:11434
+    volumes:
+      - /srv/pases/data/open-webui:/app/backend/data

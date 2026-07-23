@@ -1,0 +1,5 @@
+# Dados de bancos e volumes — nunca versionar (vão no backup, Cap. 14)
+data/
+# Segredos — nunca versionar (senhas, tokens)
+**/.env
+.env
