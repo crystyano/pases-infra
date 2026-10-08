@@ -1,0 +1,15 @@
+[Unit]
+Description=ComfyUI (PASES) - geracao de imagem/video local
+After=network.target
+
+[Service]
+WorkingDirectory=/srv/pases/comfyui
+# GPU 1 = RTX 5060 Ti (ordem do nvidia-smi); sem CUDA_DEVICE_ORDER o PyTorch pode inverter
+Environment=CUDA_DEVICE_ORDER=PCI_BUS_ID
+Environment=CUDA_VISIBLE_DEVICES=1
+ExecStart=/srv/pases/comfyui/.venv/bin/python main.py --listen 127.0.0.1 --port 8188 --output-directory /scratch/comfyui/output --temp-directory /scratch/comfyui/temp
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

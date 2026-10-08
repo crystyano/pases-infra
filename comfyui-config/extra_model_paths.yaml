@@ -1,0 +1,12 @@
+pases:
+    base_path: /dados/modelos/comfyui/
+    checkpoints: checkpoints/
+    diffusion_models: |
+        diffusion_models/
+        unet/
+    text_encoders: |
+        text_encoders/
+        clip/
+    vae: vae/
+    loras: loras/
+    upscale_models: upscale_models/
