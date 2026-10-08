@@ -3,3 +3,8 @@ data/
 # Segredos — nunca versionar (senhas, tokens)
 **/.env
 .env
+scripts/ntfy.conf
+lobechat/.env
+lobechat/data/
+# ComfyUI: clone + .venv (~5 GB), reconstruivel pelo Cap. 8A; versionar so a definicao
+comfyui/
