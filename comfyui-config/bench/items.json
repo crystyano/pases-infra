@@ -70,6 +70,18 @@
       ]
     },
     {
+      "id": "I5",
+      "tipo": "imagem",
+      "nome": "Bloco de texto longo em portugues (acentos)",
+      "prompt": "Fotografia de uma folha A4 branca sobre uma mesa de madeira, com texto impresso em preto, nitido e legivel. Titulo no topo: \"ORÇAMENTO Nº 0412\". Abaixo, quatro linhas: \"Cliente: Marcenaria Silva\", \"Item: Armário de cozinha, 3 portas\", \"Valor: R$ 4.850,00\", \"Prazo: 15 dias úteis\". Luz natural suave, foco no texto.",
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "texto"
+      ],
+      "_nota": "Adicionado em 09/10/2026 (suite v1, item extra para o teste de texto do Qwen-Image). Mede texto longo com acentos e simbolos (Ç, Ã, Á, º, R$)."
+    },
+    {
       "id": "V1",
       "tipo": "video",
       "nome": "Video curto (smoke)",
@@ -226,5 +238,6 @@
     }
   },
   "nota_ltx": "LTX 2.5 exige largura/altura finais multiplas de 64 e frames 8n+1; por isso as dimensoes do LTX diferem um pouco das do Wan (mesmos prompts, sementes e duracoes).",
-  "nota_flf": "Itens F* (primeiro e ultimo quadro) so rodam com --modelo ltx. Extremos em fixtures/ (896x512)."
+  "nota_flf": "Itens F* (primeiro e ultimo quadro) so rodam com --modelo ltx. Extremos em fixtures/ (896x512).",
+  "nota_i5": "I5 adicionado em 09/10/2026; as rodadas anteriores a essa data nao o contem."
 }
