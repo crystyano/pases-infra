@@ -152,6 +152,56 @@
       ],
       "largura_ltx": 1280,
       "altura_ltx": 704
+    },
+    {
+      "id": "F1",
+      "tipo": "video_flf",
+      "nome": "Primeiro e ultimo quadro - reconstrucao",
+      "extremos": [
+        "F_primeiro_I1_101.png",
+        "F_ultimo_V3_101.png"
+      ],
+      "prompt": "The camera glides smoothly forward across the room toward the wooden workbench, sunlight shifts gently across the wall, dust floats in the air.",
+      "largura_ltx": 896,
+      "altura_ltx": 512,
+      "quadros": 49,
+      "sementes": [
+        101,
+        102
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal",
+        "fidelidade_inicial",
+        "fidelidade_final"
+      ],
+      "_nota": "Extremos consistentes entre si: o ultimo quadro e o fim de um video LTX (V3_101) cujo inicio e a imagem I1_101. Mede se o modelo reconstroi um caminho plausivel entre dois quadros reais."
+    },
+    {
+      "id": "F2",
+      "tipo": "video_flf",
+      "nome": "Primeiro e ultimo quadro - transicao entre cenas",
+      "extremos": [
+        "F_primeiro_I1_101.png",
+        "F_ultimo_I1_102.png"
+      ],
+      "prompt": "A smooth cinematic camera move from one bright wooden workshop interior to another, the camera pushes in toward the workbench, soft natural light from the window.",
+      "largura_ltx": 896,
+      "altura_ltx": 512,
+      "quadros": 49,
+      "sementes": [
+        101,
+        102
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal",
+        "fidelidade_inicial",
+        "fidelidade_final"
+      ],
+      "_nota": "Extremos de cenas diferentes (estresse): o modelo precisa inventar a transicao. So roda com o LTX 2.5."
     }
   ],
   "metas_provisorias": {
@@ -171,8 +221,10 @@
       "anomalias": "0 graves (maos, geometria, derretimento) | 1 leves | 2 nenhuma",
       "texto": "0 ilegivel | 1 parcial | 2 correto",
       "temporal": "0 quebra visivel | 1 tremor ou deriva | 2 estavel",
-      "fidelidade_inicial": "0 ignora o quadro inicial | 1 deriva | 2 fiel"
+      "fidelidade_inicial": "0 ignora o quadro inicial | 1 deriva | 2 fiel",
+      "fidelidade_final": "0 ignora o ultimo quadro | 1 chega perto | 2 termina fiel"
     }
   },
-  "nota_ltx": "LTX 2.5 exige largura/altura finais multiplas de 64 e frames 8n+1; por isso as dimensoes do LTX diferem um pouco das do Wan (mesmos prompts, sementes e duracoes)."
+  "nota_ltx": "LTX 2.5 exige largura/altura finais multiplas de 64 e frames 8n+1; por isso as dimensoes do LTX diferem um pouco das do Wan (mesmos prompts, sementes e duracoes).",
+  "nota_flf": "Itens F* (primeiro e ultimo quadro) so rodam com --modelo ltx. Extremos em fixtures/ (896x512)."
 }

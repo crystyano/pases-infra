@@ -59,3 +59,45 @@ def wf_ltx(prompt, seed, prefix, w, h, segundos, fps=24, imagem_inicial=None):
         wf["11"]["inputs"]["video_latent"] = ["33", 0]
         wf["19"]["inputs"]["video_latent"] = ["34", 0]
     return wf
+
+
+def wf_ltx_flf(prompt, seed, prefix, w, h, segundos, fps, img_primeiro, img_ultimo):
+    """Primeiro e ultimo quadro (template oficial video_ltx2_5_flf2v). UM unico estagio, sem upscale:
+    o video nasce direto em w x h (multiplos de 32). O primeiro quadro entra via LTXVAddGuide com indice 0
+    e o ultimo com indice -1, ambos com forca 0.7; ao final os guias sao removidos (LTXVCropGuides).
+    `img_primeiro` e `img_ultimo` sao nomes de arquivo na pasta input/ do ComfyUI.
+    O negativo e o mesmo curto dos demais testes do LTX (o do template tem termos de uma cena especifica)."""
+    assert w % 32 == 0 and h % 32 == 0, "largura e altura devem ser multiplos de 32"
+    frames = segundos * fps + 1
+    assert (frames - 1) % 8 == 0, "frames precisa ser 8n+1"
+    return {
+        "1": {"class_type": "UNETLoader", "inputs": {"unet_name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors", "weight_dtype": "default"}},
+        "2": {"class_type": "VAELoader", "inputs": {"vae_name": "ltx-2.5-video-vae-bf16.safetensors"}},
+        "3": {"class_type": "VAELoader", "inputs": {"vae_name": "ltx-2.5-audio-vae-bf16.safetensors"}},
+        "4": {"class_type": "CLIPLoader", "inputs": {"clip_name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors", "type": "ltxv", "device": "default"}},
+        "6": {"class_type": "CLIPTextEncode", "inputs": {"clip": ["4", 0], "text": prompt}},
+        "7": {"class_type": "CLIPTextEncode", "inputs": {"clip": ["4", 0], "text": NEG}},
+        "8": {"class_type": "LTXVConditioning", "inputs": {"positive": ["6", 0], "negative": ["7", 0], "frame_rate": float(fps)}},
+        "40": {"class_type": "LoadImage", "inputs": {"image": img_primeiro}},
+        "41": {"class_type": "LoadImage", "inputs": {"image": img_ultimo}},
+        "42": {"class_type": "ImageScale", "inputs": {"image": ["40", 0], "upscale_method": "lanczos", "width": w, "height": h, "crop": "center"}},
+        "43": {"class_type": "ImageScale", "inputs": {"image": ["41", 0], "upscale_method": "lanczos", "width": w, "height": h, "crop": "center"}},
+        "44": {"class_type": "LTXVPreprocess", "inputs": {"image": ["42", 0], "img_compression": 18}},
+        "45": {"class_type": "LTXVPreprocess", "inputs": {"image": ["43", 0], "img_compression": 18}},
+        "9": {"class_type": "EmptyLTXVLatentVideo", "inputs": {"width": w, "height": h, "length": frames, "batch_size": 1}},
+        "10": {"class_type": "LTXVEmptyLatentAudio", "inputs": {"audio_vae": ["3", 0], "frames_number": frames, "frame_rate": fps, "batch_size": 1}},
+        "46": {"class_type": "LTXVAddGuide", "inputs": {"positive": ["8", 0], "negative": ["8", 1], "vae": ["2", 0], "latent": ["9", 0], "image": ["44", 0], "frame_idx": 0, "strength": 0.7}},
+        "47": {"class_type": "LTXVAddGuide", "inputs": {"positive": ["46", 0], "negative": ["46", 1], "vae": ["2", 0], "latent": ["46", 2], "image": ["45", 0], "frame_idx": -1, "strength": 0.7}},
+        "11": {"class_type": "LTXVConcatAVLatent", "inputs": {"video_latent": ["47", 2], "audio_latent": ["10", 0]}},
+        "12": {"class_type": "LTXVDualCFGGuider", "inputs": {"model": ["1", 0], "positive": ["47", 0], "negative": ["47", 1], "video_cfg": 1, "audio_cfg": 1}},
+        "13": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
+        "14": {"class_type": "SamplerEulerAncestral", "inputs": {"eta": 0, "s_noise": 1}},
+        "15": {"class_type": "ManualSigmas", "inputs": {"sigmas": SIGMAS_1}},
+        "16": {"class_type": "SamplerCustomAdvanced", "inputs": {"noise": ["13", 0], "guider": ["12", 0], "sampler": ["14", 0], "sigmas": ["15", 0], "latent_image": ["11", 0]}},
+        "17": {"class_type": "LTXVSeparateAVLatent", "inputs": {"av_latent": ["16", 1]}},
+        "18": {"class_type": "LTXVCropGuides", "inputs": {"positive": ["47", 0], "negative": ["47", 1], "latent": ["17", 0]}},
+        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["18", 2], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 16, "temporal_overlap": 8}},
+        "27": {"class_type": "LTXVAudioVAEDecode", "inputs": {"samples": ["17", 1], "audio_vae": ["3", 0]}},
+        "28": {"class_type": "CreateVideo", "inputs": {"images": ["26", 0], "audio": ["27", 0], "fps": float(fps)}},
+        "29": {"class_type": "SaveVideo", "inputs": {"video": ["28", 0], "filename_prefix": prefix, "format": "auto", "codec": "auto"}},
+    }

@@ -269,7 +269,7 @@ def main():
         sys.exit("ABORTADO: ha modelo carregado no Ollama (ocupa VRAM da 5060 Ti). Rode `ollama stop <modelo>`:\n" + "\n".join(ocupado))
     if sh("systemctl --user is-active comfyui") != "active":
         sys.exit("ABORTADO: comfyui.service nao esta ativo")
-    itens = [i for i in ITEMS["itens"] if (not a.only or i["id"] in a.only) and (a.modelo == "wan" or i["tipo"] != "imagem")]
+    itens = [i for i in ITEMS["itens"] if (not a.only or i["id"] in a.only) and (a.modelo == "ltx" or i["tipo"] != "video_flf") and (a.modelo == "wan" or i["tipo"] != "imagem")]
     if any(i["tipo"] == "video_i2v" for i in itens) and not any(i["id"] == "I1" for i in itens) and not (OUT / "bench").exists():
         sys.exit("ABORTADO: V3 precisa da saida do I1 (rode I1 junto)")
     total = sum(len(ITEMS["sementes_imagem"]) if i["tipo"] == "imagem" else len(i["sementes"]) for i in itens)
@@ -302,6 +302,11 @@ def main():
             prefixo = f"bench/{run}/{it['id']}_{sd}"
             if it["tipo"] == "imagem":
                 wf = wf_imagem(it["prompt"], sd, prefixo)
+            elif it["tipo"] == "video_flf":
+                for nome in it["extremos"]:
+                    shutil.copy(HERE / "fixtures" / nome, INPUT / f"pases_bench_{nome}")
+                wf = _ltx.wf_ltx_flf(it["prompt"], sd, prefixo, it["largura_ltx"], it["altura_ltx"], (it["quadros"] - 1) // ITEMS["video"]["fps"], ITEMS["video"]["fps"],
+                                     f"pases_bench_{it['extremos'][0]}", f"pases_bench_{it['extremos'][1]}")
             elif it["tipo"] == "video" and a.modelo == "ltx":
                 wf = wf_ltx(it["prompt"], sd, prefixo, it["largura_ltx"], it["altura_ltx"], (it["quadros"] - 1) // ITEMS["video"]["fps"])
             elif it["tipo"] == "video":
