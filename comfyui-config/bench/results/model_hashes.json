@@ -1,0 +1,46 @@
+{
+ "diffusion_models/z_image_turbo_bf16.safetensors": {
+  "chave": "12309866400:1791426914",
+  "sha256": "2407613050b809ffdff18a4ac99af83ea6b95443ecebdf80e064a79c825574a6"
+ },
+ "text_encoders/qwen_3_4b_fp8_mixed.safetensors": {
+  "chave": "5631994051:1791423113",
+  "sha256": "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15"
+ },
+ "vae/ae.safetensors": {
+  "chave": "335304388:1791421065",
+  "sha256": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38"
+ },
+ "diffusion_models/wan2.2_ti2v_5B_fp16.safetensors": {
+  "chave": "9999658848:1791430689",
+  "sha256": "456f901338bd9eadbded3828b819109a9b68e8a525ca5cf8d0049a69fcfeca1e"
+ },
+ "text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors": {
+  "chave": "6735906897:1791428628",
+  "sha256": "c3355d30191f1f066b26d93fba017ae9809dce6c627dda5f6a66eaa651204f68"
+ },
+ "vae/wan2.2_vae.safetensors": {
+  "chave": "1409400960:1791427298",
+  "sha256": "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156"
+ },
+ "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors": {
+  "chave": "21504034224:1791510011",
+  "sha256": "c4279eeff115cbeaca494bd2183e7d768c38fe85a184dc6afbb7159157c44334"
+ },
+ "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors": {
+  "chave": "15372969374:1791511877",
+  "sha256": "6ce688a0aa98a5fa36a9f1e6c3f42152a498cc2b53ee8c15674c64244f91487f"
+ },
+ "vae/ltx-2.5-video-vae-bf16.safetensors": {
+  "chave": "1472223346:1791503927",
+  "sha256": "847e14ca7f3355debca0cea4eaa24ac0fbcdf0061da054ac89ca638a869ddba3"
+ },
+ "vae/ltx-2.5-audio-vae-bf16.safetensors": {
+  "chave": "364866540:1791503329",
+  "sha256": "c52733d37f6a7fb7949c3dc0fb468c6cb2169e4d836983a73babb9f0d54837a5"
+ },
+ "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors": {
+  "chave": "995778752:1791503076",
+  "sha256": "eb5a71fe4068ee87ccdb1c3aa635e547ca76bd2d30ae20ae889f2c325c0677e8"
+ }
+}

@@ -1,0 +1,178 @@
+{
+  "versao_suite": "v1",
+  "descricao": "PASES-Bench Visual v1 - ver Cap. 8A do manual. NAO alterar prompts/sementes/parametros sem criar nova versao da suite (v2), senao os resultados deixam de ser comparaveis.",
+  "sementes_imagem": [
+    101,
+    102,
+    103
+  ],
+  "imagem": {
+    "modelo": "z_image_turbo_bf16",
+    "largura": 1024,
+    "altura": 1024,
+    "passos": 8,
+    "cfg": 1,
+    "shift": 3,
+    "sampler": "res_multistep",
+    "scheduler": "simple"
+  },
+  "video": {
+    "modelo": "wan2.2_ti2v_5B_fp16",
+    "passos": 20,
+    "cfg": 5,
+    "shift": 8,
+    "sampler": "uni_pc",
+    "scheduler": "simple",
+    "fps": 24,
+    "negativo": "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走"
+  },
+  "itens": [
+    {
+      "id": "I1",
+      "tipo": "imagem",
+      "nome": "Ambiente de marcenaria",
+      "prompt": "Fotografia de uma marcenaria moderna com bancada de madeira clara, projeto de moveis planejados sobre a mesa, ferramentas organizadas na parede, luz natural da manha entrando pela janela, detalhes nitidos, estilo editorial",
+      "criterios": [
+        "aderencia",
+        "anomalias"
+      ]
+    },
+    {
+      "id": "I2",
+      "tipo": "imagem",
+      "nome": "Texto em portugues na imagem",
+      "prompt": "Fotografia de uma etiqueta branca colada em uma caixa de papelao em uma oficina, com o texto impresso em preto: \"PEDIDO 1024 - MOVENTUS\" e abaixo \"Armario de cozinha - 3 portas\", texto nitido e legivel, luz de estudio",
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "texto"
+      ]
+    },
+    {
+      "id": "I3",
+      "tipo": "imagem",
+      "nome": "Mockup de tela de ERP",
+      "prompt": "Captura de tela de um sistema ERP moderno em um monitor, interface limpa com menu lateral escuro, tabela de pedidos com colunas Cliente, Produto e Valor, botao azul Novo Pedido no topo, titulo Pedidos, design profissional",
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "texto"
+      ]
+    },
+    {
+      "id": "I4",
+      "tipo": "imagem",
+      "nome": "Composicao precisa",
+      "prompt": "Fotografia de um armario de madeira branco em uma parede cinza, com exatamente tres gavetas empilhadas na parte inferior, uma porta na parte superior com puxador no lado direito, e duas prateleiras abertas acima da porta, visao frontal, fundo neutro",
+      "criterios": [
+        "aderencia",
+        "anomalias"
+      ]
+    },
+    {
+      "id": "V1",
+      "tipo": "video",
+      "nome": "Video curto (smoke)",
+      "prompt": "Uma marcenaria moderna ao amanhecer, serragem flutuando na luz do sol que entra pela janela, a camera avanca lentamente em direcao a uma bancada de madeira clara com ferramentas organizadas.",
+      "largura": 832,
+      "altura": 480,
+      "quadros": 49,
+      "sementes": [
+        101,
+        102,
+        103
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal"
+      ],
+      "largura_ltx": 896,
+      "altura_ltx": 512
+    },
+    {
+      "id": "V3",
+      "tipo": "video_i2v",
+      "nome": "Imagem para video",
+      "imagem_inicial": "I1:101",
+      "prompt": "A camera se move lentamente para a frente, a luz do sol varia suavemente, poeira de serragem flutua no ar.",
+      "largura": 832,
+      "altura": 480,
+      "quadros": 49,
+      "sementes": [
+        101,
+        102
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal",
+        "fidelidade_inicial"
+      ],
+      "largura_ltx": 896,
+      "altura_ltx": 512
+    },
+    {
+      "id": "V4",
+      "tipo": "video",
+      "nome": "Movimento complexo",
+      "prompt": "Um marceneiro lixa uma tabua de madeira clara sobre uma bancada com as duas maos, movimentos continuos e naturais, serragem saindo da lixa, camera fixa em plano medio, luz natural.",
+      "largura": 832,
+      "altura": 480,
+      "quadros": 49,
+      "sementes": [
+        101,
+        102,
+        103
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal"
+      ],
+      "largura_ltx": 896,
+      "altura_ltx": 512
+    },
+    {
+      "id": "V2",
+      "tipo": "video",
+      "nome": "Video 720p (stress)",
+      "prompt": "Uma marcenaria moderna ao amanhecer, serragem flutuando na luz do sol que entra pela janela, a camera avanca lentamente em direcao a uma bancada de madeira clara com ferramentas organizadas.",
+      "largura": 1280,
+      "altura": 704,
+      "quadros": 121,
+      "sementes": [
+        101,
+        102
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal"
+      ],
+      "largura_ltx": 1280,
+      "altura_ltx": 704
+    }
+  ],
+  "metas_provisorias": {
+    "_nota": "Provisorias ate a primeira linha de base completa ser revisada por um humano.",
+    "imagem_mediana_s_max": 20,
+    "V1_mediana_s_max": 120,
+    "V2_mediana_s_max": 900,
+    "falhas_max": 0,
+    "temp_pico_c_max": 80,
+    "potencia_pico_w_max": 300,
+    "qualidade_pct_min": 80
+  },
+  "avaliacao": {
+    "escala": "0 a 2 por criterio",
+    "criterios": {
+      "aderencia": "0 ignora partes do prompt | 1 parcial | 2 completa",
+      "anomalias": "0 graves (maos, geometria, derretimento) | 1 leves | 2 nenhuma",
+      "texto": "0 ilegivel | 1 parcial | 2 correto",
+      "temporal": "0 quebra visivel | 1 tremor ou deriva | 2 estavel",
+      "fidelidade_inicial": "0 ignora o quadro inicial | 1 deriva | 2 fiel"
+    }
+  },
+  "nota_ltx": "LTX 2.5 exige largura/altura finais multiplas de 64 e frames 8n+1; por isso as dimensoes do LTX diferem um pouco das do Wan (mesmos prompts, sementes e duracoes)."
+}

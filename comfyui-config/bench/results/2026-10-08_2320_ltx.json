@@ -1,0 +1,161 @@
+{
+ "run": "2026-10-08_2320_ltx",
+ "ambiente": {
+  "comfyui": "0.39.0",
+  "pytorch": "2.14.1+cu130",
+  "driver": "595.91.07",
+  "power_limit_w": "0, 140.00 W | 1, 150.00 W",
+  "pases_infra_commit": "5694741",
+  "suite": "v1",
+  "modelos_sha256": {
+   "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors": "c4279eeff115cbeaca494bd2183e7d768c38fe85a184dc6afbb7159157c44334",
+   "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors": "6ce688a0aa98a5fa36a9f1e6c3f42152a498cc2b53ee8c15674c64244f91487f",
+   "vae/ltx-2.5-video-vae-bf16.safetensors": "847e14ca7f3355debca0cea4eaa24ac0fbcdf0061da054ac89ca638a869ddba3",
+   "vae/ltx-2.5-audio-vae-bf16.safetensors": "c52733d37f6a7fb7949c3dc0fb468c6cb2169e4d836983a73babb9f0d54837a5",
+   "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors": "eb5a71fe4068ee87ccdb1c3aa635e547ca76bd2d30ae20ae889f2c325c0677e8"
+  },
+  "modelo_video": "ltx"
+ },
+ "registros": [
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 106.4,
+   "vram_pico_mib": 15799.0,
+   "temp_pico_c": 69.0,
+   "potencia_pico_w": 161,
+   "ram_pico_gb": 50.7,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V1_101_00001_.mp4"
+   ],
+   "item": "V1",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 19.0,
+   "vram_pico_mib": 15647.0,
+   "temp_pico_c": 67.0,
+   "potencia_pico_w": 156,
+   "ram_pico_gb": 35.1,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V1_102_00001_.mp4"
+   ],
+   "item": "V1",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 19.0,
+   "vram_pico_mib": 15663.0,
+   "temp_pico_c": 69.0,
+   "potencia_pico_w": 157,
+   "ram_pico_gb": 35.1,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V1_103_00001_.mp4"
+   ],
+   "item": "V1",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 49.0,
+   "vram_pico_mib": 15643.0,
+   "temp_pico_c": 67.0,
+   "potencia_pico_w": 157,
+   "ram_pico_gb": 50.5,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V3_101_00001_.mp4"
+   ],
+   "item": "V3",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 20.0,
+   "vram_pico_mib": 15739.0,
+   "temp_pico_c": 69.0,
+   "potencia_pico_w": 159,
+   "ram_pico_gb": 35.5,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V3_102_00001_.mp4"
+   ],
+   "item": "V3",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 49.0,
+   "vram_pico_mib": 15591.0,
+   "temp_pico_c": 67.0,
+   "potencia_pico_w": 159,
+   "ram_pico_gb": 50.6,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V4_101_00001_.mp4"
+   ],
+   "item": "V4",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 19.0,
+   "vram_pico_mib": 15653.0,
+   "temp_pico_c": 70.0,
+   "potencia_pico_w": 159,
+   "ram_pico_gb": 35.4,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V4_102_00001_.mp4"
+   ],
+   "item": "V4",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 19.0,
+   "vram_pico_mib": 15669.0,
+   "temp_pico_c": 70.0,
+   "potencia_pico_w": 161,
+   "ram_pico_gb": 35.4,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V4_103_00001_.mp4"
+   ],
+   "item": "V4",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 98.7,
+   "vram_pico_mib": 15655.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 163,
+   "ram_pico_gb": 50.4,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V2_101_00001_.mp4"
+   ],
+   "item": "V2",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 68.4,
+   "vram_pico_mib": 15637.0,
+   "temp_pico_c": 76.0,
+   "potencia_pico_w": 165,
+   "ram_pico_gb": 36.5,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_2320_ltx/V2_102_00001_.mp4"
+   ],
+   "item": "V2",
+   "semente": 102
+  }
+ ]
+}

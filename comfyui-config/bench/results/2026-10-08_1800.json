@@ -1,0 +1,329 @@
+{
+ "run": "2026-10-08_1800",
+ "ambiente": {
+  "comfyui": "0.39.0",
+  "pytorch": "2.14.1+cu130",
+  "driver": "595.91.07",
+  "power_limit_w": "0, 140.00 W | 1, 150.00 W",
+  "pases_infra_commit": "5694741",
+  "suite": "v1",
+  "modelos_sha256": {
+   "diffusion_models/z_image_turbo_bf16.safetensors": "2407613050b809ffdff18a4ac99af83ea6b95443ecebdf80e064a79c825574a6",
+   "text_encoders/qwen_3_4b_fp8_mixed.safetensors": "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15",
+   "vae/ae.safetensors": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38",
+   "diffusion_models/wan2.2_ti2v_5B_fp16.safetensors": "456f901338bd9eadbded3828b819109a9b68e8a525ca5cf8d0049a69fcfeca1e",
+   "text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors": "c3355d30191f1f066b26d93fba017ae9809dce6c627dda5f6a66eaa651204f68",
+   "vae/wan2.2_vae.safetensors": "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156"
+  }
+ },
+ "registros": [
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 50.0,
+   "vram_pico_mib": 15581.0,
+   "temp_pico_c": 69.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I1_101_00001_.png"
+   ],
+   "item": "I1",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15399.0,
+   "temp_pico_c": 72.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 26.9,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I1_102_00001_.png"
+   ],
+   "item": "I1",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15399.0,
+   "temp_pico_c": 74.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 26.9,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I1_103_00001_.png"
+   ],
+   "item": "I1",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 13.0,
+   "vram_pico_mib": 15719.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I2_101_00001_.png"
+   ],
+   "item": "I2",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15463.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 169,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I2_102_00001_.png"
+   ],
+   "item": "I2",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15463.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 26.9,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I2_103_00001_.png"
+   ],
+   "item": "I2",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 13.0,
+   "vram_pico_mib": 15687.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I3_101_00001_.png"
+   ],
+   "item": "I3",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15463.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I3_102_00001_.png"
+   ],
+   "item": "I3",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 14951.0,
+   "temp_pico_c": 76.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 26.9,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I3_103_00001_.png"
+   ],
+   "item": "I3",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 13.0,
+   "vram_pico_mib": 15719.0,
+   "temp_pico_c": 76.0,
+   "potencia_pico_w": 168,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I4_101_00001_.png"
+   ],
+   "item": "I4",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15463.0,
+   "temp_pico_c": 76.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 26.9,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I4_102_00001_.png"
+   ],
+   "item": "I4",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 12.0,
+   "vram_pico_mib": 15463.0,
+   "temp_pico_c": 76.0,
+   "potencia_pico_w": 168,
+   "ram_pico_gb": 26.8,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/I4_103_00001_.png"
+   ],
+   "item": "I4",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 103.1,
+   "vram_pico_mib": 15823.0,
+   "temp_pico_c": 76.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 27.6,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V1_101_00001_.mp4"
+   ],
+   "item": "V1",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 66.1,
+   "vram_pico_mib": 15823.0,
+   "temp_pico_c": 77.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 27.5,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V1_102_00001_.mp4"
+   ],
+   "item": "V1",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 66.1,
+   "vram_pico_mib": 15823.0,
+   "temp_pico_c": 77.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 27.5,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V1_103_00001_.mp4"
+   ],
+   "item": "V1",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 69.2,
+   "vram_pico_mib": 15377.0,
+   "temp_pico_c": 77.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 28.0,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V3_101_00001_.mp4"
+   ],
+   "item": "V3",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 68.1,
+   "vram_pico_mib": 15569.0,
+   "temp_pico_c": 77.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 28.0,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V3_102_00001_.mp4"
+   ],
+   "item": "V3",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 68.1,
+   "vram_pico_mib": 15521.0,
+   "temp_pico_c": 78.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 28.0,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V4_101_00001_.mp4"
+   ],
+   "item": "V4",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 66.2,
+   "vram_pico_mib": 15825.0,
+   "temp_pico_c": 78.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 27.9,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V4_102_00001_.mp4"
+   ],
+   "item": "V4",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 66.2,
+   "vram_pico_mib": 15825.0,
+   "temp_pico_c": 78.0,
+   "potencia_pico_w": 166,
+   "ram_pico_gb": 28.0,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V4_103_00001_.mp4"
+   ],
+   "item": "V4",
+   "semente": 103
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 554.8,
+   "vram_pico_mib": 15841.0,
+   "temp_pico_c": 78.0,
+   "potencia_pico_w": 164,
+   "ram_pico_gb": 29.4,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V2_101_00001_.mp4"
+   ],
+   "item": "V2",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 553.7,
+   "vram_pico_mib": 15329.0,
+   "temp_pico_c": 78.0,
+   "potencia_pico_w": 164,
+   "ram_pico_gb": 29.4,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-08_1800/V2_102_00001_.mp4"
+   ],
+   "item": "V2",
+   "semente": 102
+  }
+ ]
+}
