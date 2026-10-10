@@ -23,6 +23,7 @@ cd /srv/pases/comfyui-config/bench
 /srv/pases/comfyui/.venv/bin/python -I bench.py --imagem qwen     # so imagens (I1-I5) com o Qwen-Image 2.1, ~5 min
 /srv/pases/comfyui/.venv/bin/python -I bench.py --imagem qwen2512  # Qwen-Image 2512: exige REINSTALAR os arquivos (Cap. 8A, 6D), ~55 min
 /srv/pases/comfyui/.venv/bin/python -I bench.py --modelo ltx --only X1 # extensao de video (exige um V1 do LTX de rodada anterior), ~6 min
+/srv/pases/comfyui/.venv/bin/python -I bench.py --imagem flux2 --encoder bf16   # idem com o encoder bf16 (REMOVIDO do disco: ver Cap. 8A, 8A.5, para reinstalar)
 /srv/pases/comfyui/.venv/bin/python -I bench.py --imagem flux2    # so imagens (I1-I5) com o FLUX.2 klein 4B (texto->imagem), ~2 min
 /srv/pases/comfyui/.venv/bin/python -I bench.py --edicao          # so edicao de imagens (E1-E4) com o FLUX.2 klein 4B, ~3 min
 /srv/pases/comfyui/.venv/bin/python -I bench.py --only I1 V1      # so alguns itens

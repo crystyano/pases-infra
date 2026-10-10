@@ -273,11 +273,14 @@ def relatorio(run, amb, regs):
 # --------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", nargs="*"); ap.add_argument("--no-restart", action="store_true"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--edicao", action="store_true", help="roda so os itens de EDICAO de imagem (E1-E4) com o FLUX.2 klein 4B")
+    ap.add_argument("--only", nargs="*"); ap.add_argument("--no-restart", action="store_true"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--encoder", choices=["fp8", "bf16"], default="fp8", help="text encoder do FLUX.2 klein: fp8 (padrao, qwen_3_4b_fp8_mixed) ou bf16 (qwen_3_4b, o do template oficial)")
+    ap.add_argument("--edicao", action="store_true", help="roda so os itens de EDICAO de imagem (E1-E4) com o FLUX.2 klein 4B")
     ap.add_argument("--imagem", choices=["zimage", "qwen", "qwen2512", "flux2"], default="zimage", help="modelo de IMAGEM; qwen (2.1, so avaliacao) e qwen2512 (Apache 2.0) rodam so os itens de imagem")
     ap.add_argument("--modelo", choices=["wan", "ltx"], default="wan", help="modelo de VIDEO (imagem sempre Z-Image); ltx roda so os itens de video")
     a = ap.parse_args()
-    run = datetime.now().strftime("%Y-%m-%d_%H%M") + ("_flux2edit" if a.edicao else "_" + a.imagem if a.imagem != "zimage" else "_ltx" if a.modelo == "ltx" else "")
+    if a.encoder == "bf16":
+        _flux2.FLUX2_CLIP = "qwen_3_4b.safetensors"; ARQ_FLUX2[1] = "text_encoders/qwen_3_4b.safetensors"
+    run = datetime.now().strftime("%Y-%m-%d_%H%M") + ("_flux2edit" if a.edicao else "_" + a.imagem if a.imagem != "zimage" else "_ltx" if a.modelo == "ltx" else "") + ("_encbf16" if a.encoder == "bf16" else "")
 
     ocupado = [l for l in sh("ollama ps").splitlines()[1:] if l.strip()]
     if ocupado:
