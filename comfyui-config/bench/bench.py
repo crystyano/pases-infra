@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # `python -I` na
 import ltx as _ltx
 import qwen as _qwen
 import flux2 as _flux2
+import extend as _extend
 from datetime import datetime
 from pathlib import Path
 
@@ -151,7 +152,8 @@ def gerar(wf, timeout_s=2400):
                 for o in h[pid]["outputs"].values():
                     for k in ("images", "gifs"):
                         for f in o.get(k, []):
-                            saidas.append(str(OUT / f.get("subfolder", "") / f["filename"]))
+                            if f.get("type", "output") == "output":   # ignora previas de arquivos de ENTRADA (ex.: LoadVideo)
+                                saidas.append(str(OUT / f.get("subfolder", "") / f["filename"]))
                 break
             time.sleep(1)
         else:
@@ -282,7 +284,7 @@ def main():
         sys.exit("ABORTADO: ha modelo carregado no Ollama (ocupa VRAM da 5060 Ti). Rode `ollama stop <modelo>`:\n" + "\n".join(ocupado))
     if sh("systemctl --user is-active comfyui") != "active":
         sys.exit("ABORTADO: comfyui.service nao esta ativo")
-    itens = [i for i in ITEMS["itens"] if ((i["tipo"] == "edicao") == a.edicao) and (a.imagem == "zimage" or i["tipo"] == "imagem") and (not a.only or i["id"] in a.only) and (a.modelo == "ltx" or i["tipo"] != "video_flf") and (a.modelo == "wan" or i["tipo"] != "imagem")]
+    itens = [i for i in ITEMS["itens"] if ((i["tipo"] == "edicao") == a.edicao) and (a.imagem == "zimage" or i["tipo"] == "imagem") and (not a.only or i["id"] in a.only) and (a.modelo == "ltx" or i["tipo"] not in ("video_flf", "video_ext")) and (a.modelo == "wan" or i["tipo"] != "imagem")]
     if any(i["tipo"] == "video_i2v" for i in itens) and not any(i["id"] == "I1" for i in itens) and not (OUT / "bench").exists():
         sys.exit("ABORTADO: V3 precisa da saida do I1 (rode I1 junto)")
     total = sum(len(ITEMS["sementes_imagem"]) if i["tipo"] == "imagem" else len(i["sementes"]) for i in itens)
@@ -300,12 +302,16 @@ def main():
                 time.sleep(2)
     amb = ambiente(a.modelo, a.imagem, a.edicao); regs = []
     pasta_run = Path("/scratch/bench") / run; pasta_run.mkdir(parents=True, exist_ok=True)
+    costuras = []
     saida_json = HERE / "results" / f"{run}.json"; saidas_i1 = {}
 
     def salvar():
-        json.dump({"run": run, "ambiente": amb, "registros": regs}, open(saida_json, "w"), indent=1, ensure_ascii=False)
+        json.dump({"run": run, "ambiente": amb, "registros": regs, "costuras": costuras}, open(saida_json, "w"), indent=1, ensure_ascii=False)
 
     for it in itens:
+        if it["tipo"] == "video_ext":
+            r_, c_ = _extend.executar(it, run, pasta_run, gerar, INPUT, OUT, ITEMS)
+            regs += r_; costuras += c_; salvar(); continue
         if it["tipo"] == "imagem":
             sementes = ITEMS["sementes_imagem"]
         else:
@@ -356,7 +362,13 @@ def main():
         if regs and regs[-1].get("motivo", "").startswith("abortado"):
             break
     salvar()
-    (HERE / "results" / f"{run}.md").write_text(relatorio(run, amb, [r for r in regs if "tempo_s" in r]), encoding="utf-8")
+    md = relatorio(run, amb, [r for r in regs if "tempo_s" in r])
+    if costuras:
+        md += "\n## Emendas da extensao de video (X1)\n\nSalto = diferenca na emenda / mediana da diferenca entre quadros normais (~1 = emenda invisivel; >>1 = pulo visivel).\n\n| Metodo | Semente | Quadros guia | Quadros | Salto na emenda 1 | Salto na emenda 2 |\n|---|---|---|---|---|---|\n"
+        for c in costuras:
+            sj = [e["salto_x"] for e in c["emendas"]] + [None, None]
+            md += f"| {c['metodo']} | {c['semente']} | {c['quadros_guia']} | {c['quadros']} | {sj[0]} | {sj[1]} |\n"
+    (HERE / "results" / f"{run}.md").write_text(md, encoding="utf-8")
     print(f"Pronto. Relatorio: {HERE}/results/{run}.md | folhas: {pasta_run}")
 
 

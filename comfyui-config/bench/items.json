@@ -291,6 +291,38 @@
         "E_I4_101.jpg"
       ],
       "prompt": "Place the white cabinet from the second image against the back wall of the room from the first image. Keep the room, the window and the lighting from the first image."
+    },
+    {
+      "id": "X1",
+      "tipo": "video_ext",
+      "nome": "Extensao de video (continuacao)",
+      "base": "V1",
+      "sementes": [
+        101,
+        102
+      ],
+      "metodos": [
+        {
+          "id": "M1",
+          "quadros_guia": 1
+        },
+        {
+          "id": "M2",
+          "quadros_guia": 9
+        }
+      ],
+      "etapas": 2,
+      "segundos_por_trecho": 2,
+      "largura_ltx": 896,
+      "altura_ltx": 512,
+      "prompt": "The camera continues to move slowly forward toward the light wooden workbench with organized tools, warm morning sunlight through the window, fine sawdust floating in the air, same workshop.",
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "temporal",
+        "fidelidade_inicial"
+      ],
+      "_nota": "Parte do V1 do LTX (2 s) e encadeia 2 extensoes de 2 s (total ~6 s). M1 guia o proximo trecho pelo ultimo quadro; M2 pelos ultimos 9. So roda com --modelo ltx e depende de uma rodada LTX anterior com V1."
     }
   ],
   "metas_provisorias": {
