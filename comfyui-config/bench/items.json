@@ -214,6 +214,83 @@
         "fidelidade_final"
       ],
       "_nota": "Extremos de cenas diferentes (estresse): o modelo precisa inventar a transicao. So roda com o LTX 2.5."
+    },
+    {
+      "tipo": "edicao",
+      "sementes": [
+        101,
+        102,
+        103
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "preservacao"
+      ],
+      "id": "E1",
+      "nome": "Edicao: mudar a cor",
+      "imagens": [
+        "E_I4_101.jpg"
+      ],
+      "prompt": "Change the color of the cabinet to dark green. Keep the black knobs, the shape, the shelf and the background exactly the same."
+    },
+    {
+      "tipo": "edicao",
+      "sementes": [
+        101,
+        102,
+        103
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "preservacao"
+      ],
+      "id": "E2",
+      "nome": "Edicao: trocar o material",
+      "imagens": [
+        "E_I1_101.jpg"
+      ],
+      "prompt": "Change all the light wooden surfaces to dark walnut wood. Keep the room, the window, the lighting and every object exactly the same."
+    },
+    {
+      "tipo": "edicao",
+      "sementes": [
+        101,
+        102,
+        103
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "preservacao"
+      ],
+      "id": "E3",
+      "nome": "Edicao: remover um objeto",
+      "imagens": [
+        "E_I1_102.jpg"
+      ],
+      "prompt": "Remove the black frying pan from the workbench. Keep everything else exactly the same."
+    },
+    {
+      "tipo": "edicao",
+      "sementes": [
+        101,
+        102,
+        103
+      ],
+      "criterios": [
+        "aderencia",
+        "anomalias",
+        "preservacao"
+      ],
+      "id": "E4",
+      "nome": "Edicao: duas imagens de referencia",
+      "imagens": [
+        "E_I1_101.jpg",
+        "E_I4_101.jpg"
+      ],
+      "prompt": "Place the white cabinet from the second image against the back wall of the room from the first image. Keep the room, the window and the lighting from the first image."
     }
   ],
   "metas_provisorias": {
@@ -234,10 +311,12 @@
       "texto": "0 ilegivel | 1 parcial | 2 correto",
       "temporal": "0 quebra visivel | 1 tremor ou deriva | 2 estavel",
       "fidelidade_inicial": "0 ignora o quadro inicial | 1 deriva | 2 fiel",
-      "fidelidade_final": "0 ignora o ultimo quadro | 1 chega perto | 2 termina fiel"
+      "fidelidade_final": "0 ignora o ultimo quadro | 1 chega perto | 2 termina fiel",
+      "preservacao": "0 altera o que devia ficar igual | 1 pequenas mudancas indevidas | 2 preserva o resto"
     }
   },
   "nota_ltx": "LTX 2.5 exige largura/altura finais multiplas de 64 e frames 8n+1; por isso as dimensoes do LTX diferem um pouco das do Wan (mesmos prompts, sementes e duracoes).",
   "nota_flf": "Itens F* (primeiro e ultimo quadro) so rodam com --modelo ltx. Extremos em fixtures/ (896x512).",
-  "nota_i5": "I5 adicionado em 09/10/2026; as rodadas anteriores a essa data nao o contem."
+  "nota_i5": "I5 adicionado em 09/10/2026; as rodadas anteriores a essa data nao o contem.",
+  "nota_edicao": "Itens E* (edicao de imagens) so rodam com --edicao (FLUX.2 klein 4B). Imagens-base em fixtures/ (E_*.jpg, 1024x1024, geradas pelo Z-Image na rodada de 08/10)."
 }

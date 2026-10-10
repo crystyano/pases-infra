@@ -17,6 +17,7 @@ import argparse, hashlib, json, os, shutil, statistics, subprocess, sys, threadi
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # `python -I` nao inclui a pasta do script
 import ltx as _ltx
 import qwen as _qwen
+import flux2 as _flux2
 from datetime import datetime
 from pathlib import Path
 
@@ -35,6 +36,9 @@ ARQ_QWEN = [
 ]
 ARQ_QWEN2512 = [
     "diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors", "text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors", "vae/qwen_image_vae.safetensors",
+]
+ARQ_FLUX2 = [
+    "diffusion_models/flux-2-klein-4b-fp8.safetensors", "text_encoders/qwen_3_4b_fp8_mixed.safetensors", "vae/flux2-klein-vae-apache.safetensors",
 ]
 ARQ_MODELOS = [
     "diffusion_models/z_image_turbo_bf16.safetensors", "text_encoders/qwen_3_4b_fp8_mixed.safetensors", "vae/ae.safetensors",
@@ -181,14 +185,14 @@ def hashes_modelos(lista=None):
     return res
 
 
-def ambiente(modelo="wan", imagem="zimage"):
+def ambiente(modelo="wan", imagem="zimage", edicao=False):
     s = http("/system_stats")["system"]
     return {
         "comfyui": s.get("comfyui_version"), "pytorch": s.get("pytorch_version"),
         "driver": sh("nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -1"),
         "power_limit_w": sh("nvidia-smi --query-gpu=index,power.limit --format=csv,noheader").replace("\n", " | "),
         "pases_infra_commit": sh("git -C /srv/pases rev-parse --short HEAD"),
-        "suite": ITEMS["versao_suite"], "modelos_sha256": hashes_modelos(ARQ_QWEN2512 if imagem == "qwen2512" else ARQ_QWEN if imagem == "qwen" else ARQ_LTX if modelo == "ltx" else None), "modelo_video": modelo, "modelo_imagem": imagem,
+        "suite": ITEMS["versao_suite"], "modelos_sha256": hashes_modelos(ARQ_FLUX2 if edicao else ARQ_QWEN2512 if imagem == "qwen2512" else ARQ_QWEN if imagem == "qwen" else ARQ_LTX if modelo == "ltx" else None), "modelo_video": modelo, "modelo_imagem": imagem,
     }
 
 
@@ -267,23 +271,24 @@ def relatorio(run, amb, regs):
 # --------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", nargs="*"); ap.add_argument("--no-restart", action="store_true"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--imagem", choices=["zimage", "qwen", "qwen2512"], default="zimage", help="modelo de IMAGEM; qwen (2.1, so avaliacao) e qwen2512 (Apache 2.0) rodam so os itens de imagem")
+    ap.add_argument("--only", nargs="*"); ap.add_argument("--no-restart", action="store_true"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--edicao", action="store_true", help="roda so os itens de EDICAO de imagem (E1-E4) com o FLUX.2 klein 4B")
+    ap.add_argument("--imagem", choices=["zimage", "qwen", "qwen2512"], default="zimage", help="modelo de IMAGEM; qwen (2.1, so avaliacao) e qwen2512 (Apache 2.0) rodam so os itens de imagem")
     ap.add_argument("--modelo", choices=["wan", "ltx"], default="wan", help="modelo de VIDEO (imagem sempre Z-Image); ltx roda so os itens de video")
     a = ap.parse_args()
-    run = datetime.now().strftime("%Y-%m-%d_%H%M") + ("_" + a.imagem if a.imagem != "zimage" else "_ltx" if a.modelo == "ltx" else "")
+    run = datetime.now().strftime("%Y-%m-%d_%H%M") + ("_flux2edit" if a.edicao else "_" + a.imagem if a.imagem != "zimage" else "_ltx" if a.modelo == "ltx" else "")
 
     ocupado = [l for l in sh("ollama ps").splitlines()[1:] if l.strip()]
     if ocupado:
         sys.exit("ABORTADO: ha modelo carregado no Ollama (ocupa VRAM da 5060 Ti). Rode `ollama stop <modelo>`:\n" + "\n".join(ocupado))
     if sh("systemctl --user is-active comfyui") != "active":
         sys.exit("ABORTADO: comfyui.service nao esta ativo")
-    itens = [i for i in ITEMS["itens"] if (a.imagem == "zimage" or i["tipo"] == "imagem") and (not a.only or i["id"] in a.only) and (a.modelo == "ltx" or i["tipo"] != "video_flf") and (a.modelo == "wan" or i["tipo"] != "imagem")]
+    itens = [i for i in ITEMS["itens"] if ((i["tipo"] == "edicao") == a.edicao) and (a.imagem == "zimage" or i["tipo"] == "imagem") and (not a.only or i["id"] in a.only) and (a.modelo == "ltx" or i["tipo"] != "video_flf") and (a.modelo == "wan" or i["tipo"] != "imagem")]
     if any(i["tipo"] == "video_i2v" for i in itens) and not any(i["id"] == "I1" for i in itens) and not (OUT / "bench").exists():
         sys.exit("ABORTADO: V3 precisa da saida do I1 (rode I1 junto)")
     total = sum(len(ITEMS["sementes_imagem"]) if i["tipo"] == "imagem" else len(i["sementes"]) for i in itens)
     print(f"Run {run}: {len(itens)} itens, {total} geracoes. Itens: {[i['id'] for i in itens]}")
     if a.dry_run:
-        print("dry-run: ambiente:", json.dumps({k: v for k, v in ambiente(a.modelo, a.imagem).items() if k != 'modelos_sha256'}, ensure_ascii=False)); return
+        print("dry-run: ambiente:", json.dumps({k: v for k, v in ambiente(a.modelo, a.imagem, a.edicao).items() if k != 'modelos_sha256'}, ensure_ascii=False)); return
 
     if not a.no_restart:
         print("Reiniciando comfyui.service (1a geracao = medida a frio)...")
@@ -293,7 +298,7 @@ def main():
                 http("/system_stats"); break
             except Exception:
                 time.sleep(2)
-    amb = ambiente(a.modelo, a.imagem); regs = []
+    amb = ambiente(a.modelo, a.imagem, a.edicao); regs = []
     pasta_run = Path("/scratch/bench") / run; pasta_run.mkdir(parents=True, exist_ok=True)
     saida_json = HERE / "results" / f"{run}.json"; saidas_i1 = {}
 
@@ -310,6 +315,11 @@ def main():
             prefixo = f"bench/{run}/{it['id']}_{sd}"
             if it["tipo"] == "imagem":
                 wf = {"qwen": _qwen.wf_qwen, "qwen2512": _qwen.wf_qwen2512}[a.imagem](it["prompt"], sd, prefixo) if a.imagem != "zimage" else wf_imagem(it["prompt"], sd, prefixo)
+            elif it["tipo"] == "edicao":
+                nomes = []
+                for nome in it["imagens"]:
+                    shutil.copy(HERE / "fixtures" / nome, INPUT / f"pases_bench_{nome}"); nomes.append(f"pases_bench_{nome}")
+                wf = _flux2.wf_flux2_edit(it["prompt"], sd, prefixo, nomes)
             elif it["tipo"] == "video_flf":
                 for nome in it["extremos"]:
                     shutil.copy(HERE / "fixtures" / nome, INPUT / f"pases_bench_{nome}")
@@ -338,7 +348,9 @@ def main():
             if r["motivo"].startswith("abortado"):
                 print("Parando a suite por seguranca termica."); break
         try:
-            (folha_imagens if it["tipo"] == "imagem" else folha_videos)(arqs, pasta_run / f"{it['id']}.png")
+            if it["tipo"] == "edicao":
+                arqs = [str(HERE / "fixtures" / n) for n in it["imagens"]] + arqs   # originais primeiro, depois os resultados
+            (folha_imagens if it["tipo"] in ("imagem", "edicao") else folha_videos)(arqs, pasta_run / f"{it['id']}.png")
         except Exception as e:
             print("   (folha de contato falhou:", repr(e), ")")
         if regs and regs[-1].get("motivo", "").startswith("abortado"):

@@ -66,5 +66,13 @@
  "vae/qwen_image_vae.safetensors": {
   "chave": "253806246:1791581526",
   "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f"
+ },
+ "diffusion_models/flux-2-klein-4b-fp8.safetensors": {
+  "chave": "4070624520:1791593127",
+  "sha256": "97ed34fe0567e436200f2faee3939b88f2b5d99f8af2a4dc16532c4245c0ccb6"
+ },
+ "vae/flux2-klein-vae-apache.safetensors": {
+  "chave": "168120878:1791592616",
+  "sha256": "ca70d2202afe6415bdbcb8793ba8cd99fd159cfe6192381504d6c4d3036e0f04"
  }
 }
