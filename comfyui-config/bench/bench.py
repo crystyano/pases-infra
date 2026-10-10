@@ -194,7 +194,7 @@ def ambiente(modelo="wan", imagem="zimage", edicao=False):
         "driver": sh("nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -1"),
         "power_limit_w": sh("nvidia-smi --query-gpu=index,power.limit --format=csv,noheader").replace("\n", " | "),
         "pases_infra_commit": sh("git -C /srv/pases rev-parse --short HEAD"),
-        "suite": ITEMS["versao_suite"], "modelos_sha256": hashes_modelos(ARQ_FLUX2 if edicao else ARQ_QWEN2512 if imagem == "qwen2512" else ARQ_QWEN if imagem == "qwen" else ARQ_LTX if modelo == "ltx" else None), "modelo_video": modelo, "modelo_imagem": imagem,
+        "suite": ITEMS["versao_suite"], "modelos_sha256": hashes_modelos(ARQ_FLUX2 if edicao or imagem == "flux2" else ARQ_QWEN2512 if imagem == "qwen2512" else ARQ_QWEN if imagem == "qwen" else ARQ_LTX if modelo == "ltx" else None), "modelo_video": modelo, "modelo_imagem": imagem,
     }
 
 
@@ -274,7 +274,7 @@ def relatorio(run, amb, regs):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*"); ap.add_argument("--no-restart", action="store_true"); ap.add_argument("--dry-run", action="store_true"); ap.add_argument("--edicao", action="store_true", help="roda so os itens de EDICAO de imagem (E1-E4) com o FLUX.2 klein 4B")
-    ap.add_argument("--imagem", choices=["zimage", "qwen", "qwen2512"], default="zimage", help="modelo de IMAGEM; qwen (2.1, so avaliacao) e qwen2512 (Apache 2.0) rodam so os itens de imagem")
+    ap.add_argument("--imagem", choices=["zimage", "qwen", "qwen2512", "flux2"], default="zimage", help="modelo de IMAGEM; qwen (2.1, so avaliacao) e qwen2512 (Apache 2.0) rodam so os itens de imagem")
     ap.add_argument("--modelo", choices=["wan", "ltx"], default="wan", help="modelo de VIDEO (imagem sempre Z-Image); ltx roda so os itens de video")
     a = ap.parse_args()
     run = datetime.now().strftime("%Y-%m-%d_%H%M") + ("_flux2edit" if a.edicao else "_" + a.imagem if a.imagem != "zimage" else "_ltx" if a.modelo == "ltx" else "")
@@ -320,7 +320,7 @@ def main():
         for sd in sementes:
             prefixo = f"bench/{run}/{it['id']}_{sd}"
             if it["tipo"] == "imagem":
-                wf = {"qwen": _qwen.wf_qwen, "qwen2512": _qwen.wf_qwen2512}[a.imagem](it["prompt"], sd, prefixo) if a.imagem != "zimage" else wf_imagem(it["prompt"], sd, prefixo)
+                wf = {"qwen": _qwen.wf_qwen, "qwen2512": _qwen.wf_qwen2512, "flux2": _flux2.wf_flux2_t2i}[a.imagem](it["prompt"], sd, prefixo) if a.imagem != "zimage" else wf_imagem(it["prompt"], sd, prefixo)
             elif it["tipo"] == "edicao":
                 nomes = []
                 for nome in it["imagens"]:

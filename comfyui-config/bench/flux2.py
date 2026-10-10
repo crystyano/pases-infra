@@ -41,3 +41,24 @@ def wf_flux2_edit(prompt, seed, prefix, imagens, megapixels=1.0):
     wf["97"] = {"class_type": "VAEDecode", "inputs": {"samples": ["96", 0], "vae": ["3", 0]}}
     wf["98"] = {"class_type": "SaveImage", "inputs": {"images": ["97", 0], "filename_prefix": prefix}}
     return wf
+
+
+def wf_flux2_t2i(prompt, seed, prefix, w=1024, h=1024, passos=FLUX2_PASSOS, cfg=FLUX2_CFG):
+    """Texto -> imagem do FLUX.2 klein 4B distilled, espelhando o template oficial
+    `image_flux2_klein_text_to_image` (subgrafo "Distilled"): CFG 1, 4 passos, `euler`, negativo = condicionamento zerado.
+    O template usa `flux-2-klein-4b` em bf16 (7,2 GB); aqui roda a versao fp8 (4,07 GB) do mesmo modelo distilled."""
+    return {
+        "1": {"class_type": "UNETLoader", "inputs": {"unet_name": FLUX2_UNET, "weight_dtype": "default"}},
+        "2": {"class_type": "CLIPLoader", "inputs": {"clip_name": FLUX2_CLIP, "type": "flux2", "device": "default"}},
+        "3": {"class_type": "VAELoader", "inputs": {"vae_name": FLUX2_VAE}},
+        "4": {"class_type": "CLIPTextEncode", "inputs": {"clip": ["2", 0], "text": prompt}},
+        "5": {"class_type": "ConditioningZeroOut", "inputs": {"conditioning": ["4", 0]}},
+        "6": {"class_type": "EmptyFlux2LatentImage", "inputs": {"width": w, "height": h, "batch_size": 1}},
+        "7": {"class_type": "Flux2Scheduler", "inputs": {"steps": passos, "width": w, "height": h}},
+        "8": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "euler"}},
+        "9": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
+        "10": {"class_type": "CFGGuider", "inputs": {"model": ["1", 0], "positive": ["4", 0], "negative": ["5", 0], "cfg": cfg}},
+        "11": {"class_type": "SamplerCustomAdvanced", "inputs": {"noise": ["9", 0], "guider": ["10", 0], "sampler": ["8", 0], "sigmas": ["7", 0], "latent_image": ["6", 0]}},
+        "12": {"class_type": "VAEDecode", "inputs": {"samples": ["11", 0], "vae": ["3", 0]}},
+        "13": {"class_type": "SaveImage", "inputs": {"images": ["12", 0], "filename_prefix": prefix}},
+    }
