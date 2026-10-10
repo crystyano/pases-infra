@@ -1,0 +1,62 @@
+{
+ "run": "2026-10-09_2021_qwen2512",
+ "ambiente": {
+  "comfyui": "0.39.0",
+  "pytorch": "2.14.1+cu130",
+  "driver": "595.91.07",
+  "power_limit_w": "0, 140.00 W | 1, 150.00 W",
+  "pases_infra_commit": "f1295a9",
+  "suite": "v1",
+  "modelos_sha256": {
+   "diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors": "5dc80554d5d83390046a2f4a94ece06afb7700bf7b0aaf8bde9769793875876b",
+   "text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+   "vae/qwen_image_vae.safetensors": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f"
+  },
+  "modelo_video": "wan",
+  "modelo_imagem": "qwen2512"
+ },
+ "registros": [
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 250.2,
+   "vram_pico_mib": 15441.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 167,
+   "ram_pico_gb": 37.5,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-09_2021_qwen2512/I5_101_00001_.png"
+   ],
+   "item": "I5",
+   "semente": 101
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 218.2,
+   "vram_pico_mib": 15513.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 168,
+   "ram_pico_gb": 37.6,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-09_2021_qwen2512/I5_102_00001_.png"
+   ],
+   "item": "I5",
+   "semente": 102
+  },
+  {
+   "ok": true,
+   "motivo": "",
+   "tempo_s": 218.2,
+   "vram_pico_mib": 15417.0,
+   "temp_pico_c": 75.0,
+   "potencia_pico_w": 168,
+   "ram_pico_gb": 37.7,
+   "saidas": [
+    "/scratch/comfyui/output/bench/2026-10-09_2021_qwen2512/I5_103_00001_.png"
+   ],
+   "item": "I5",
+   "semente": 103
+  }
+ ]
+}

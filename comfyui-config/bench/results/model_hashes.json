@@ -54,5 +54,17 @@
  "vae/qwen_image_2.1_vae_bf16.safetensors": {
   "chave": "675509688:1791514969",
   "sha256": "bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9"
+ },
+ "diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors": {
+  "chave": "20430679144:1791587979",
+  "sha256": "5dc80554d5d83390046a2f4a94ece06afb7700bf7b0aaf8bde9769793875876b"
+ },
+ "text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors": {
+  "chave": "9384670680:1791583830",
+  "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4"
+ },
+ "vae/qwen_image_vae.safetensors": {
+  "chave": "253806246:1791581526",
+  "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f"
  }
 }
