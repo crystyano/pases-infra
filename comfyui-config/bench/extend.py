@@ -39,7 +39,7 @@ def wf_ltx_extend(prompt, seed, prefix, w, h, segundos, fps, video_ant, n_ant, k
         "16": {"class_type": "SamplerCustomAdvanced", "inputs": {"noise": ["13", 0], "guider": ["12", 0], "sampler": ["14", 0], "sigmas": ["15", 0], "latent_image": ["11", 0]}},
         "17": {"class_type": "LTXVSeparateAVLatent", "inputs": {"av_latent": ["16", 1]}},
         "18": {"class_type": "LTXVCropGuides", "inputs": {"positive": ["46", 0], "negative": ["46", 1], "latent": ["17", 0]}},
-        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["18", 2], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 16, "temporal_overlap": 8}},
+        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["18", 2], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 64, "temporal_overlap": 16}},
         "27": {"class_type": "LTXVAudioVAEDecode", "inputs": {"samples": ["17", 1], "audio_vae": ["3", 0]}},
         "28": {"class_type": "CreateVideo", "inputs": {"images": ["26", 0], "audio": ["27", 0], "fps": float(fps)}},
         "29": {"class_type": "SaveVideo", "inputs": {"video": ["28", 0], "filename_prefix": prefix, "format": "auto", "codec": "auto"}},

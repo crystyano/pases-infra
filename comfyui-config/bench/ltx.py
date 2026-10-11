@@ -43,7 +43,7 @@ def wf_ltx(prompt, seed, prefix, w, h, segundos, fps=24, imagem_inicial=None):
         "24": {"class_type": "SamplerCustomAdvanced", "inputs": {"noise": ["21", 0], "guider": ["20", 0], "sampler": ["22", 0], "sigmas": ["23", 0], "latent_image": ["19", 0]}},
         "25": {"class_type": "LTXVSeparateAVLatent", "inputs": {"av_latent": ["24", 0]}},
         # decodificacao
-        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["25", 0], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 16, "temporal_overlap": 8}},
+        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["25", 0], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 64, "temporal_overlap": 16}},
         "27": {"class_type": "LTXVAudioVAEDecode", "inputs": {"samples": ["25", 1], "audio_vae": ["3", 0]}},
         "28": {"class_type": "CreateVideo", "inputs": {"images": ["26", 0], "audio": ["27", 0], "fps": float(fps)}},
         "29": {"class_type": "SaveVideo", "inputs": {"video": ["28", 0], "filename_prefix": prefix, "format": "auto", "codec": "auto"}},
@@ -96,7 +96,7 @@ def wf_ltx_flf(prompt, seed, prefix, w, h, segundos, fps, img_primeiro, img_ulti
         "16": {"class_type": "SamplerCustomAdvanced", "inputs": {"noise": ["13", 0], "guider": ["12", 0], "sampler": ["14", 0], "sigmas": ["15", 0], "latent_image": ["11", 0]}},
         "17": {"class_type": "LTXVSeparateAVLatent", "inputs": {"av_latent": ["16", 1]}},
         "18": {"class_type": "LTXVCropGuides", "inputs": {"positive": ["47", 0], "negative": ["47", 1], "latent": ["17", 0]}},
-        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["18", 2], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 16, "temporal_overlap": 8}},
+        "26": {"class_type": "VAEDecodeTiled", "inputs": {"samples": ["18", 2], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 64, "temporal_overlap": 16}},
         "27": {"class_type": "LTXVAudioVAEDecode", "inputs": {"samples": ["17", 1], "audio_vae": ["3", 0]}},
         "28": {"class_type": "CreateVideo", "inputs": {"images": ["26", 0], "audio": ["27", 0], "fps": float(fps)}},
         "29": {"class_type": "SaveVideo", "inputs": {"video": ["28", 0], "filename_prefix": prefix, "format": "auto", "codec": "auto"}},

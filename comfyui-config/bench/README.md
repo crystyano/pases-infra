@@ -9,6 +9,7 @@ de epocas diferentes sejam comparaveis em condicoes identicas.
 | `items.json` | Os 8 itens (I1-I4 imagem, V1-V4 video), parametros e metas provisorias. NAO alterar sem criar a v2 |
 | `bench.py` | Runner: uma geracao por vez, mede VRAM/RAM/temperatura/potencia, relatorio e folhas de contato |
 | `extend.py` | Extensao de video com o LTX 2.5 (item X1): quadros-guia do trecho anterior, costura com ffmpeg e metrica do salto nas emendas |
+| `qualidade.py` | Metrica objetiva de piscar/borrao periodico (oscilacao de nitidez, autocorrelacao em 8 quadros, quedas); entra em todo relatorio de video |
 | `flux2.py` | Workflows do FLUX.2 klein 4B: EDICAO de imagens e texto->imagem (Apache 2.0; VAE do repositorio Apache do klein) |
 | `qwen.py` | Workflows do Qwen-Image 2.1 (so avaliacao: licenca Qwen Research, nao comercial) e do 2512 (Apache 2.0; testado e REMOVIDO do disco em 09/10/2026, ver Cap. 8A passo 6D para reinstalar) |
 | `ltx.py` | Workflow do LTX 2.5 em formato de API (dois estagios, audio+video; versao imagem-para-video) |
@@ -35,3 +36,9 @@ Saidas: `results/<rodada>.json|.md` (versionados) e folhas de contato em `/scrat
 
 A qualidade e avaliada por humano (0 a 2 por criterio); a ficha esta em branco no relatorio de cada rodada.
 As metas operacionais sao provisorias ate a primeira revisao humana.
+
+## Aviso sobre resultados antigos do LTX 2.5 (corrigido em 11/10/2026)
+As rodadas do LTX anteriores a 2026-10-11 (`2026-10-08_2320_ltx`, `2026-10-08_2337_ltx`, `2026-10-09_2208_ltx`) usaram o
+`VAEDecodeTiled` com blocos temporais 16/8 em vez de 64/16 (template): os videos tem uma queda de nitidez a cada 8 quadros.
+A suite foi repetida em `2026-10-11_0055_ltx`. Tempos e memoria das rodadas antigas continuam validos; as metricas de
+nitidez/piscar nao. Mantidas aqui apenas como historico.

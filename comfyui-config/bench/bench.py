@@ -19,6 +19,7 @@ import ltx as _ltx
 import qwen as _qwen
 import flux2 as _flux2
 import extend as _extend
+import qualidade as _qual
 from datetime import datetime
 from pathlib import Path
 
@@ -165,8 +166,15 @@ def gerar(wf, timeout_s=2400):
     mon.parar = True; mon.join()
     if mon.abortou:
         ok, motivo = False, f"abortado: temperatura > {TEMP_ABORT} C"
-    return {"ok": ok, "motivo": motivo, "tempo_s": round(dt, 1), "vram_pico_mib": mon.vram, "temp_pico_c": mon.temp,
-            "potencia_pico_w": round(mon.pot), "ram_pico_gb": round(mon.ram, 1), "saidas": saidas}
+    res = {"ok": ok, "motivo": motivo, "tempo_s": round(dt, 1), "vram_pico_mib": mon.vram, "temp_pico_c": mon.temp,
+           "potencia_pico_w": round(mon.pot), "ram_pico_gb": round(mon.ram, 1), "saidas": saidas}
+    vids = [x for x in saidas if x.endswith(".mp4")]
+    if ok and vids:
+        try:
+            res["piscar"] = _qual.piscar(vids[0])   # metrica objetiva de piscar/borrao periodico (ver qualidade.py)
+        except Exception as e:
+            res["piscar"] = {"erro": repr(e)[:80]}
+    return res
 
 
 # ----------------------------------------------------------------- ambiente
@@ -235,11 +243,19 @@ def mediana(v):
     return round(statistics.median(v), 1) if v else None
 
 
+def _pisc(rs):
+    """Oscilacao de nitidez (%) | autocorrelacao lag 8 | quedas: pior caso do item; '-' se nao for video."""
+    v = [r['piscar'] for r in rs if isinstance(r.get('piscar'), dict) and r['piscar'].get('osc_nitidez_pct') is not None]
+    if not v:
+        return '- | - | -'
+    return f"{max(x['osc_nitidez_pct'] for x in v)} | {max(x['autocorr_lag8'] for x in v)} | {max(x['quedas'] for x in v)}"
+
+
 def relatorio(run, amb, regs):
     L = [f"# PASES-Bench Visual {amb['suite']} - {run}", "",
          f"ComfyUI {amb['comfyui']} | PyTorch {amb['pytorch']} | driver {amb['driver']} | power limit: {amb['power_limit_w']} | pases-infra {amb['pases_infra_commit']}", "",
          "## Medicoes (automaticas)", "",
-         "| Item | Sementes | Falhas | Tempo mediana (s) | 1a geracao (s) | VRAM pico (MiB) | Temp pico (C) | Potencia pico (W) | RAM pico (GB) |", "|---|---|---|---|---|---|---|---|---|"]
+         "| Item | Sementes | Falhas | Tempo mediana (s) | 1a geracao (s) | VRAM pico (MiB) | Temp pico (C) | Potencia pico (W) | RAM pico (GB) | Oscil. nitidez (%) | Lag-8 | Quedas |", "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     por = {}
     for r in regs:
         por.setdefault(r["item"], []).append(r)
@@ -250,7 +266,7 @@ def relatorio(run, amb, regs):
             continue
         falhas = sum(not r["ok"] for r in rs); tempos = [r["tempo_s"] for r in rs if r["ok"]]
         L.append(f"| {it['id']} {it['nome']} | {len(rs)} | {falhas} | {mediana(tempos)} | {rs[0]['tempo_s']} | {max(r['vram_pico_mib'] for r in rs):.0f} | "
-                 f"{max(r['temp_pico_c'] for r in rs):.0f} | {max(r['potencia_pico_w'] for r in rs)} | {max(r['ram_pico_gb'] for r in rs)} |")
+                 f"{max(r['temp_pico_c'] for r in rs):.0f} | {max(r['potencia_pico_w'] for r in rs)} | {max(r['ram_pico_gb'] for r in rs)} | {_pisc(rs)} |")
         veredito.append((it["id"], falhas, mediana(tempos), max(r["temp_pico_c"] for r in rs), max(r["potencia_pico_w"] for r in rs)))
     L += ["", "## Metas provisorias (operacionais)", "", "| Item | Falhas (meta 0) | Mediana (s) | Meta (s) | Temp (meta <= 80 C) | Potencia (meta <= 300 W) | Resultado |", "|---|---|---|---|---|---|---|"]
     for iid, f, med, t, p in veredito:
