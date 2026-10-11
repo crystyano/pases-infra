@@ -1,0 +1,426 @@
+{
+ "modelo": "qwen-cline",
+ "parametros_modelfile": [
+  "PARAMETER num_ctx 32768",
+  "PARAMETER repeat_penalty 1.05",
+  "PARAMETER stop <|im_start|>",
+  "PARAMETER stop <|im_end|>",
+  "PARAMETER stop <|endoftext|>",
+  "PARAMETER temperature 0.7",
+  "PARAMETER top_k 20",
+  "PARAMETER top_p 0.8"
+ ],
+ "fixtures": {
+  "i2": [
+   {
+    "geracao": {
+     "ttft_s": 0.35,
+     "tokens": 722,
+     "tok_s": 140.9,
+     "prompt_tokens": 706,
+     "total_s": 5.5
+    },
+    "teste": {
+     "passou": 0,
+     "total": 193,
+     "fracao": 0.0,
+     "nota": "193 failed in 0.06s",
+     "falhas": 193,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 28,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": "E   NameError: name 'cupom' is not defined"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.16,
+     "tokens": 732,
+     "tok_s": 140.8,
+     "prompt_tokens": 706,
+     "total_s": 5.4
+    },
+    "teste": {
+     "passou": 0,
+     "total": 193,
+     "fracao": 0.0,
+     "nota": "193 failed in 0.06s",
+     "falhas": 193,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 24,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": "E   NameError: name 'cupom' is not defined"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 730,
+     "tok_s": 140.8,
+     "prompt_tokens": 706,
+     "total_s": 5.3
+    },
+    "teste": {
+     "passou": 0,
+     "total": 193,
+     "fracao": 0.0,
+     "nota": "193 failed in 0.06s",
+     "falhas": 193,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 28,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": "E   NameError: name 'cupom' is not defined"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 727,
+     "tok_s": 140.7,
+     "prompt_tokens": 706,
+     "total_s": 5.3
+    },
+    "teste": {
+     "passou": 0,
+     "total": 193,
+     "fracao": 0.0,
+     "nota": "193 failed in 0.06s",
+     "falhas": 193,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 28,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": "E   NameError: name 'cupom' is not defined"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 734,
+     "tok_s": 140.7,
+     "prompt_tokens": 706,
+     "total_s": 5.4
+    },
+    "teste": {
+     "passou": 0,
+     "total": 193,
+     "fracao": 0.0,
+     "nota": "193 failed in 0.06s",
+     "falhas": 193,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 27,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": "E   NameError: name 'cupom' is not defined"
+   }
+  ],
+  "i2b": [
+   {
+    "geracao": {
+     "ttft_s": 0.31,
+     "tokens": 796,
+     "tok_s": 140.6,
+     "prompt_tokens": 682,
+     "total_s": 6.0
+    },
+    "teste": {
+     "passou": 241,
+     "total": 241,
+     "fracao": 1.0,
+     "nota": "241 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 8,
+     "maior_funcao_linhas": 35,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.16,
+     "tokens": 696,
+     "tok_s": 141.2,
+     "prompt_tokens": 682,
+     "total_s": 5.1
+    },
+    "teste": {
+     "passou": 216,
+     "total": 241,
+     "fracao": 0.8962655601659751,
+     "nota": "25 failed, 216 passed in 0.05s",
+     "falhas": 25,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 10,
+     "maior_funcao_linhas": 30,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.16,
+     "tokens": 700,
+     "tok_s": 141.3,
+     "prompt_tokens": 682,
+     "total_s": 5.1
+    },
+    "teste": {
+     "passou": 216,
+     "total": 241,
+     "fracao": 0.8962655601659751,
+     "nota": "25 failed, 216 passed in 0.05s",
+     "falhas": 25,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 10,
+     "maior_funcao_linhas": 30,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.16,
+     "tokens": 712,
+     "tok_s": 141.1,
+     "prompt_tokens": 682,
+     "total_s": 5.2
+    },
+    "teste": {
+     "passou": 233,
+     "total": 241,
+     "fracao": 0.966804979253112,
+     "nota": "8 failed, 233 passed in 0.05s",
+     "falhas": 8,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 6,
+     "maior_funcao_linhas": 34,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 678,
+     "tok_s": 141.4,
+     "prompt_tokens": 682,
+     "total_s": 5.0
+    },
+    "teste": {
+     "passou": 216,
+     "total": 241,
+     "fracao": 0.8962655601659751,
+     "nota": "25 failed, 216 passed in 0.05s",
+     "falhas": 25,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 31,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   }
+  ],
+  "i2c": [
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 517,
+     "tok_s": 143.4,
+     "prompt_tokens": 564,
+     "total_s": 3.9
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 35,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 538,
+     "tok_s": 143.3,
+     "prompt_tokens": 564,
+     "total_s": 3.9
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 6,
+     "maior_funcao_linhas": 64,
+     "melhorou_estrutura": false
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 531,
+     "tok_s": 143.3,
+     "prompt_tokens": 564,
+     "total_s": 3.9
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 6,
+     "maior_funcao_linhas": 64,
+     "melhorou_estrutura": false
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 522,
+     "tok_s": 143.4,
+     "prompt_tokens": 564,
+     "total_s": 3.8
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 33,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.15,
+     "tokens": 536,
+     "tok_s": 143.2,
+     "prompt_tokens": 564,
+     "total_s": 3.9
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 6,
+     "maior_funcao_linhas": 70,
+     "melhorou_estrutura": false
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   }
+  ]
+ }
+}

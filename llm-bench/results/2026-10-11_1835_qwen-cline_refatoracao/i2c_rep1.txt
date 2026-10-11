@@ -1,0 +1,67 @@
+```python
+def resumo_producao(ordens):
+    DADOS_ORDENS = []
+    LINHAS = []
+    REVISAR = []
+    TOTAL_APROV = 0
+    CONTAGEM = 0
+
+    for ordem in ordens:
+        area_chapa = calcular_area_chapa(ordem)
+        area_pecas = calcular_area_pecas(ordem["pecas"])
+        aprov = calcular_aproveitamento(area_chapa, area_pecas)
+        status = determinar_status(aprov)
+        prioridade = ordem.get("prioridade", 3)
+
+        if prioridade == 1 and aprov < 70:
+            REVISAR.append(ordem["id"])
+
+        if status != "INVALIDA":
+            TOTAL_APROV += aprov
+            CONTAGEM += 1
+
+        DADOS_ORDENS.append((prioridade, -aprov, ordem["id"], status, aprov))
+
+    DADOS_ORDENS.sort()
+    for dado in DADOS_ORDENS:
+        LINHAS.append(f"{dado[2]} | {dado[3]} | {dado[4]}%")
+
+    MEDIA = round(TOTAL_APROV / CONTAGEM, 1) if CONTAGEM > 0 else 0
+
+    return {
+        "linhas": LINHAS,
+        "media_aproveitamento": MEDIA,
+        "total_ordens": len(ordens),
+        "revisar": REVISAR
+    }
+
+
+def calcular_area_chapa(ordem):
+    return ordem["chapa_w"] * ordem["chapa_h"]
+
+
+def calcular_area_pecas(pecas):
+    area_total = 0
+    for p in pecas:
+        area_total += p["w"] * p["h"] * p["qtd"]
+    return area_total
+
+
+def calcular_aproveitamento(area_chapa, area_pecas):
+    if area_chapa <= 0:
+        return 0
+    return round((area_pecas / area_chapa) * 100, 1)
+
+
+def determinar_status(aprov):
+    if aprov > 100:
+        return "INVALIDA"
+    elif aprov >= 85:
+        return "OTIMO"
+    elif aprov >= 70:
+        return "BOM"
+    elif aprov >= 50:
+        return "REGULAR"
+    else:
+        return "RUIM"
+```

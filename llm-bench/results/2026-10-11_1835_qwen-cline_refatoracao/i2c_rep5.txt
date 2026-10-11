@@ -1,0 +1,72 @@
+```python
+def resumo_producao(ordens):
+    def calcular_area_chapa(ordem):
+        return ordem["chapa_w"] * ordem["chapa_h"]
+    
+    def calcular_area_pecas(ordem):
+        area = 0
+        for p in ordem["pecas"]:
+            area += p["w"] * p["h"] * p["qtd"]
+        return area
+    
+    def calcular_aproveitamento(area_chapa, area_pecas):
+        if area_chapa <= 0:
+            return 0
+        return round((area_pecas / area_chapa) * 100, 1)
+    
+    def determinar_status(aproveitamento):
+        if aproveitamento > 100:
+            return "INVALIDA"
+        elif aproveitamento >= 85:
+            return "OTIMO"
+        elif aproveitamento >= 70:
+            return "BOM"
+        elif aproveitamento >= 50:
+            return "REGULAR"
+        else:
+            return "RUIM"
+    
+    def deve_ser_revisada(ordem, aproveitamento):
+        return (ordem.get("prioridade", 3) == 1 and aproveitamento < 70)
+    
+    linhas = []
+    revisar = []
+    total_aprov = 0
+    contagem = 0
+    dados = []
+    
+    for o in ordens:
+        area_chapa = calcular_area_chapa(o)
+        area_pecas = calcular_area_pecas(o)
+        aprov = calcular_aproveitamento(area_chapa, area_pecas)
+        status = determinar_status(aprov)
+        
+        if deve_ser_revisada(o, aprov):
+            revisar.append(o["id"])
+            
+        if status != "INVALIDA":
+            total_aprov += aprov
+            contagem += 1
+            
+        dados.append((
+            o.get("prioridade", 3),
+            -aprov,
+            o["id"],
+            status,
+            aprov
+        ))
+    
+    dados.sort()
+    
+    for d in dados:
+        linhas.append(f"{d[2]} | {d[3]} | {d[4]}%")
+    
+    media = round(total_aprov / contagem, 1) if contagem > 0 else 0
+    
+    return {
+        "linhas": linhas,
+        "media_aproveitamento": media,
+        "total_ordens": len(ordens),
+        "revisar": revisar
+    }
+```

@@ -1,0 +1,89 @@
+```python
+def calcular_pedido(pedido):
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+    
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+    frete = _calcular_frete(peso, cliente)
+    desconto = _calcular_desconto(subtotal, cliente, cupom)
+    base = subtotal - desconto
+    imposto = _calcular_imposto(base, cliente)
+    total = base + imposto + frete
+    
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": round(frete, 2),
+        "imposto": imposto,
+        "total": round(total, 2),
+        "peso_kg": round(peso, 2)
+    }
+
+
+def _calcular_subtotal_e_peso(itens):
+    subtotal = 0
+    peso = 0
+    for item in itens:
+        subtotal += item["preco"] * item["qtd"]
+        peso += item["peso_kg"] * item["qtd"]
+    return round(subtotal, 2), peso
+
+
+def _calcular_frete(peso, cliente):
+    UF_SP = "SP"
+    FAIXAS_PESO = [(5, 20), (20, float('inf'))]
+    VALORES_FRETE_SP = [20, 45, 90]
+    VALORES_FRETE_OUTROS = [35, 70, 140]
+    
+    if peso <= FAIXAS_PESO[0][0]:
+        indice = 0
+    elif peso <= FAIXAS_PESO[1][0]:
+        indice = 1
+    else:
+        indice = 2
+    
+    if cliente["uf"] == UF_SP:
+        frete = VALORES_FRETE_SP[indice]
+    else:
+        frete = VALORES_FRETE_OUTROS[indice]
+    
+    if cliente["tipo"] == "VIP":
+        frete *= 0.5
+    
+    if cupom == "FRETEGRATIS":
+        if peso > 50:
+            frete = 30
+        else:
+            frete = 0
+            
+    return frete
+
+
+def _calcular_desconto(subtotal, cliente, cupom):
+    desconto = 0
+    
+    if cupom == "BEMVINDO10" and subtotal >= 200:
+        desconto = subtotal * 0.10
+    
+    if cliente["tipo"] == "VIP":
+        if subtotal >= 1000:
+            desconto += (subtotal - desconto) * 0.05
+        elif subtotal >= 500:
+            desconto += (subtotal - desconto) * 0.02
+            
+    return round(desconto, 2)
+
+
+def _calcular_imposto(base, cliente):
+    ALIQUOTAS = {
+        "SP": 0.18,
+        "RJ": 0.20,
+        "MG": 0.18,
+        "outros": 0.12
+    }
+    
+    uf = cliente["uf"]
+    aliquota = ALIQUOTAS.get(uf, ALIQUOTAS["outros"])
+    return round(base * aliquota, 2)
+```

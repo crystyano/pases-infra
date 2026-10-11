@@ -1,0 +1,91 @@
+```python
+def calcular_parcelas(venda):
+    # Validações iniciais
+    validar_entrada(venda)
+    valor = venda["valor"]
+    entrada = venda.get("entrada", 0)
+    n = venda["parcelas"]
+    forma = venda["forma"]
+    score = venda.get("cliente_score", 0)
+
+    # Cálculo do valor financiado
+    financiado = valor - entrada
+
+    # Aplicação de descontos para PIX
+    if forma == "PIX":
+        financiado = aplicar_desconto_pix(financiado, valor)
+        n = 1
+        taxa = 0
+    else:
+        taxa = obter_taxa(forma, n, score)
+
+    # Cálculo do total com juros
+    total = calcular_total(financiado, taxa, n)
+    
+    # Cálculo das parcelas
+    parcelas = gerar_parcelas(total, n)
+    
+    return {
+        "forma": forma,
+        "financiado": round(financiado, 2),
+        "taxa_mensal": taxa,
+        "parcelas": parcelas,
+        "total_final": round(entrada + total, 2),
+        "juros_total": round(total - financiado, 2)
+    }
+
+
+def validar_entrada(venda):
+    valor = venda["valor"]
+    entrada = venda.get("entrada", 0)
+    n = venda["parcelas"]
+    
+    if n < 1 or n > 12:
+        raise ValueError("parcelas invalidas")
+    if entrada < 0 or entrada >= valor:
+        raise ValueError("entrada invalida")
+    if venda["forma"] == "BOLETO" and n > 6 and entrada < valor * 0.2:
+        raise ValueError("entrada minima")
+
+
+def aplicar_desconto_pix(financiado, valor):
+    if valor >= 1000:
+        return financiado - financiado * 0.05
+    else:
+        return financiado - financiado * 0.03
+
+
+def obter_taxa(forma, n, score):
+    if forma == "BOLETO":
+        if n <= 3:
+            return 0
+        elif n <= 6:
+            return 0.015
+        else:
+            return 0.025
+    elif forma == "CARTAO":
+        if n <= 6:
+            return 0 if score >= 700 else 0.0199
+        else:
+            return 0.0199 if score >= 700 else 0.0299
+    else:
+        raise ValueError("forma invalida")
+
+
+def calcular_total(financiado, taxa, n):
+    if taxa > 0:
+        return financiado * ((1 + taxa) ** n)
+    return financiado
+
+
+def gerar_parcelas(total, n):
+    valor_parcela = round(total / n, 2)
+    parcelas = [valor_parcela] * n
+    soma = round(valor_parcela * n, 2)
+    diferenca = round(total - soma, 2)
+    
+    if diferenca != 0:
+        parcelas[n - 1] = round(parcelas[n - 1] + diferenca, 2)
+    
+    return parcelas
+```

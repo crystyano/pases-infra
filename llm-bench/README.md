@@ -7,6 +7,7 @@ nunca existiram; esta versao usa **fixtures sinteticas de marcenaria**, com test
 cd /srv/pases/llm-bench
 ./bench_llm.py --validar                         # confere as fixtures contra as solucoes de referencia (nao chama o modelo)
 ./bench_llm.py --modelo qwen-cline --reps 3      # roda tudo; precisa do Ollama no ar e do ComfyUI parado (VRAM livre)
+./bench_llm.py --modelo qwen-cline --reps 5 --refatoracao   # so o item 2, nas 3 fixtures de refatoracao
 ```
 
 Ambiente de teste (pytest, venv proprio; fora do Git): `uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python pytest`.
@@ -15,7 +16,7 @@ Resultados e saidas cruas do modelo em `results/<rodada>/` (`resultado.json`, `i
 | Item | O que testa | Como pontua |
 |---|---|---|
 | 1 | Gerar um modulo Python (orcamento) a partir de uma especificacao fixa | 23 testes ocultos (pytest) |
-| 2 | Refatorar um modulo bagunçado sem mudar o comportamento | 193 testes de caracterizacao (comportamento congelado do original) + metricas de estrutura (AST) |
+| 2 | Refatorar um modulo bagunçado sem mudar o comportamento (3 fixtures: pedido, parcelas, producao) | 193 + 241 + 141 testes de caracterizacao (comportamento congelado do original) + metricas de estrutura (AST) + causa do primeiro erro |
 | 5 | Pergunta de negocio em portugues com resposta numerica (lucro R$ 1.116,50; margem 23,02%) | numeros corretos, portugues e limite de linhas (automatico); a avaliacao do portugues e HUMANA |
 | 6 | Tarefa de agente com ferramentas (list/read/write/run_tests) em um repositorio de 3 modulos | 12 testes ocultos depois do agente terminar |
 

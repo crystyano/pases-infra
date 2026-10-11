@@ -115,26 +115,47 @@ def item1(modelo, opcoes, rep, saida):
         return {"geracao": _g(g), "teste": rodar_pytest(t, ["test_hidden.py"], N_ESPERADO["i1"])}
 
 
-def item2(modelo, opcoes, rep, saida):
-    orig = (FIX / "i2_refatoracao/pedido.py").read_text(encoding="utf-8")
+CFG_REFAT = {
+    "i2":  {"dir": "i2_refatoracao", "arquivo": "pedido.py",   "funcao": "calcular_pedido",   "assinatura": "calcular_pedido(pedido)",   "n": 193},
+    "i2b": {"dir": "i2b_parcelas",   "arquivo": "parcelas.py", "funcao": "calcular_parcelas", "assinatura": "calcular_parcelas(venda)",  "n": 241},
+    "i2c": {"dir": "i2c_producao",   "arquivo": "producao.py", "funcao": "resumo_producao",   "assinatura": "resumo_producao(ordens)",   "n": 141},
+}
+
+
+def primeiro_erro(pasta, arquivos):
+    """Causa do primeiro teste que falha (para saber SE o codigo quebra ou so se comporta diferente)."""
+    env = {"PATH": "/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE": "1", "HOME": str(pasta)}
+    r = subprocess.run([PY, "-m", "pytest", "-q", "-x", "--tb=line", "-p", "no:cacheprovider", *arquivos], cwd=pasta, capture_output=True, text=True, timeout=120, env=env)
+    linhas = [l.strip() for l in (r.stdout + r.stderr).splitlines() if re.search(r"Error|assert|Exception", l)]
+    return linhas[0][:200] if linhas else ""
+
+
+def refatoracao(modelo, opcoes, rep, saida, chave="i2"):
+    c = CFG_REFAT[chave]; pasta_fix = FIX / c["dir"]
+    orig = (pasta_fix / c["arquivo"]).read_text(encoding="utf-8")
     prompt = ("Refatore o módulo abaixo para melhorar a legibilidade e a manutenção, SEM mudar o comportamento (mesmos resultados para as mesmas entradas, "
-              "inclusive os casos especiais). Mantenha o nome e a assinatura de `calcular_pedido(pedido)`. Divida em funções menores com nomes claros, elimine a "
-              "duplicação e use constantes ou tabelas onde fizer sentido. Responda com um único bloco ```python com o módulo completo (arquivo `pedido.py`), "
-              "sem explicações longas.\n\n```python\n" + orig + "```\n")
+              f"inclusive os casos especiais e os erros). Mantenha o nome e a assinatura de `{c['assinatura']}`. Divida em funções menores com nomes claros, elimine a "
+              "duplicação e use constantes ou tabelas onde fizer sentido. Responda com um único bloco ```python com o módulo completo "
+              f"(arquivo `{c['arquivo']}`), sem explicações longas.\n\n```python\n" + orig + "```\n")
     g = gerar_stream(modelo, [{"role": "user", "content": prompt}], {**opcoes, "seed": rep})
-    codigo = extrair_codigo(g["texto"], "def calcular_pedido")
-    (saida / f"i2_rep{rep}.txt").write_text(g["texto"], encoding="utf-8")
+    codigo = extrair_codigo(g["texto"], "def " + c["funcao"])
+    (saida / f"{chave}_rep{rep}.txt").write_text(g["texto"], encoding="utf-8")
     base = metricas_ast(orig)
     if not codigo:
-        return {"geracao": _g(g), "teste": {"passou": 0, "total": N_ESPERADO["i2"], "fracao": 0.0, "nota": "sem bloco de codigo"}, "ast": None, "ast_original": base}
+        return {"geracao": _g(g), "teste": {"passou": 0, "total": c["n"], "fracao": 0.0, "nota": "sem bloco de codigo"}, "ast": None, "ast_original": base, "primeiro_erro": "sem bloco de codigo"}
     with tempfile.TemporaryDirectory() as t:
-        t = Path(t); (t / "pedido.py").write_text(codigo)
+        t = Path(t); (t / c["arquivo"]).write_text(codigo)
         for a in ("test_hidden.py", "casos.json"):
-            shutil.copy(FIX / "i2_refatoracao" / a, t)
-        res = rodar_pytest(t, ["test_hidden.py"], N_ESPERADO["i2"])
+            shutil.copy(pasta_fix / a, t)
+        res = rodar_pytest(t, ["test_hidden.py"], c["n"])
+        erro = primeiro_erro(t, ["test_hidden.py"]) if res["passou"] < c["n"] else ""
     m = metricas_ast(codigo)
     m["melhorou_estrutura"] = bool(m["funcoes"] >= 3 and m["maior_funcao_linhas"] < base["maior_funcao_linhas"])
-    return {"geracao": _g(g), "teste": res, "ast": m, "ast_original": base}
+    return {"geracao": _g(g), "teste": res, "ast": m, "ast_original": base, "primeiro_erro": erro}
+
+
+def item2(modelo, opcoes, rep, saida):
+    return refatoracao(modelo, opcoes, rep, saida, "i2")
 
 
 def _norm_num(s):
@@ -242,6 +263,9 @@ def validar():
             d = t / nome; d.mkdir(); [shutil.copy(FIX / r, d) for r in ref]; s = conta(d, arqs); ok &= f"{n} passed" in s; print(nome, "referencia:", s)
         d = t / "i2"; d.mkdir(); shutil.copy(FIX / "i2_refatoracao/reference/pedido_refatorado.py", d / "pedido.py"); [shutil.copy(FIX / "i2_refatoracao" / a, d) for a in ("test_hidden.py", "casos.json")]
         s = conta(d, ["test_hidden.py"]); ok &= f"{N_ESPERADO['i2']} passed" in s; print("i2 referencia:", s)
+        for chave, ref in (("i2b", "parcelas_refatorado.py"), ("i2c", "producao_refatorado.py")):
+            c = CFG_REFAT[chave]; d = t / chave; d.mkdir(); shutil.copy(FIX / c["dir"] / "reference" / ref, d / c["arquivo"]); [shutil.copy(FIX / c["dir"] / a, d) for a in ("test_hidden.py", "casos.json")]
+            s = conta(d, ["test_hidden.py"]); ok &= f"{c['n']} passed" in s; print(chave, "referencia:", s)
         d = t / "i6"; d.mkdir(); [shutil.copy(x, d) for x in (FIX / "i6_agente/reference").glob("*.py")]; [shutil.copy(x, d) for x in (FIX / "i6_agente/hidden").glob("*.py")]
         s = conta(d, ["test_reserva.py", "test_relatorio_reserva.py"]); ok &= f"{N_ESPERADO['i6']} passed" in s; print("i6 referencia:", s)
         d = t / "i6b"; d.mkdir(); [shutil.copy(x, d) for x in (FIX / "i6_agente/repo_inicial").glob("*.py")]; [shutil.copy(x, d) for x in (FIX / "i6_agente/hidden").glob("*.py")]
@@ -249,15 +273,34 @@ def validar():
     print("FIXTURES OK" if ok else "FIXTURES COM PROBLEMA"); return ok
 
 
+def main_refatoracao(a, saida):
+    opcoes = {"num_predict": 4096}
+    subprocess.run(["ollama", "stop", a.modelo], capture_output=True); time.sleep(3)
+    gerar_stream(a.modelo, [{"role": "user", "content": "Responda apenas: pronto"}], {**opcoes, "seed": 0})      # carga + aquecimento
+    res = {"modelo": a.modelo, "parametros_modelfile": [l.strip() for l in subprocess.run(["ollama", "show", a.modelo, "--modelfile"], capture_output=True, text=True).stdout.splitlines() if l.startswith("PARAMETER")], "fixtures": {k: [] for k in CFG_REFAT}}
+    for rep in range(1, a.reps + 1):
+        for chave in CFG_REFAT:
+            try:
+                r = refatoracao(a.modelo, opcoes, rep, saida, chave)
+            except Exception as e:
+                r = {"erro": repr(e)}
+            res["fixtures"][chave].append(r); t = r.get("teste", {})
+            print(f"[{chave} rep{rep}] testes {t.get('passou')}/{t.get('total')} | {r.get('primeiro_erro', r.get('erro', ''))[:120]}", flush=True)
+            (saida / "resultado.json").write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding="utf-8")
+    print("PRONTO:", saida / "resultado.json")
+
+
 # ---------------------------------------------------------------------- main
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--modelo", default="qwen-cline"); ap.add_argument("--reps", type=int, default=3); ap.add_argument("--validar", action="store_true")
+    ap = argparse.ArgumentParser(); ap.add_argument("--modelo", default="qwen-cline"); ap.add_argument("--reps", type=int, default=3); ap.add_argument("--validar", action="store_true"); ap.add_argument("--refatoracao", action="store_true", help="roda SO o item 2 (refatoracao) em todas as fixtures de refatoracao")
     a = ap.parse_args()
     if a.validar:
         sys.exit(0 if validar() else 1)
     if not validar():
         sys.exit("ABORTADO: as fixtures nao validaram")
-    run = datetime.now().strftime("%Y-%m-%d_%H%M") + "_" + a.modelo.replace(":", "-"); saida = HERE / "results" / run; saida.mkdir(parents=True, exist_ok=True)
+    run = datetime.now().strftime("%Y-%m-%d_%H%M") + "_" + a.modelo.replace(":", "-") + ("_refatoracao" if a.refatoracao else ""); saida = HERE / "results" / run; saida.mkdir(parents=True, exist_ok=True)
+    if a.refatoracao:
+        return main_refatoracao(a, saida)
     opcoes = {"num_predict": 4096}          # demais parametros (temperature, top_k, top_p, num_ctx) vem do Modelfile do modelo
     info = subprocess.run(["ollama", "show", a.modelo, "--modelfile"], capture_output=True, text=True).stdout
     params = [l.strip() for l in info.splitlines() if l.startswith("PARAMETER")]
