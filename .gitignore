@@ -10,3 +10,5 @@ lobechat/data/
 comfyui/
 # Ambiente de voz (venv de 1,6 GB; reconstruivel pelo tts-config/README.md)
 tts/
+# Blender (1,6 GB; reconstruivel pelo blender-config/README.md)
+blender/
