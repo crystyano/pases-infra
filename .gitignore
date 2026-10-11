@@ -8,3 +8,5 @@ lobechat/.env
 lobechat/data/
 # ComfyUI: clone + .venv (~5 GB), reconstruivel pelo Cap. 8A; versionar so a definicao
 comfyui/
+# Ambiente de voz (venv de 1,6 GB; reconstruivel pelo tts-config/README.md)
+tts/
