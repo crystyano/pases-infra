@@ -1,0 +1,89 @@
+```python
+def calcular_pedido(pedido):
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+    
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+    frete = _calcular_frete(peso, cliente)
+    desconto = _calcular_desconto(subtotal, cliente, cupom)
+    imposto = _calcular_imposto(subtotal, desconto, cliente)
+    
+    base = subtotal - desconto
+    total = round(base + imposto + frete, 2)
+    
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": round(frete, 2),
+        "imposto": imposto,
+        "total": total,
+        "peso_kg": round(peso, 2)
+    }
+
+
+def _calcular_subtotal_e_peso(itens):
+    subtotal = 0
+    peso = 0
+    for item in itens:
+        subtotal += item["preco"] * item["qtd"]
+        peso += item["peso_kg"] * item["qtd"]
+    return round(subtotal, 2), peso
+
+
+def _calcular_frete(peso, cliente):
+    tabela_frete = {
+        (0, 5): {"SP": 20, "outros": 35},
+        (5, 20): {"SP": 45, "outros": 70},
+        (20, float("inf")): {"SP": 90, "outros": 140}
+    }
+    
+    for limite_min, limite_max in tabela_frete:
+        if limite_min < peso <= limite_max:
+            frete = tabela_frete[(limite_min, limite_max)][cliente["uf"]] if cliente["uf"] in ["SP", "RJ", "MG"] else tabela_frete[(limite_min, limite_max)]["outros"]
+            break
+    else:
+        frete = 0
+    
+    if cliente["tipo"] == "VIP":
+        frete *= 0.5
+    
+    if cupom == "FRETEGRATIS":
+        if peso > 50:
+            frete = 30
+        else:
+            frete = 0
+            
+    return frete
+
+
+def _calcular_desconto(subtotal, cliente, cupom):
+    desconto = 0
+    
+    if cupom == "BEMVINDO10" and subtotal >= 200:
+        desconto = subtotal * 0.10
+    
+    if cliente["tipo"] == "VIP":
+        if subtotal >= 1000:
+            desconto += (subtotal - desconto) * 0.05
+        elif subtotal >= 500:
+            desconto += (subtotal - desconto) * 0.02
+            
+    return round(desconto, 2)
+
+
+def _calcular_imposto(subtotal, desconto, cliente):
+    base = subtotal - desconto
+    
+    aliquotas = {
+        "SP": 0.18,
+        "RJ": 0.20,
+        "MG": 0.18,
+        "outros": 0.12
+    }
+    
+    aliq = aliquotas.get(cliente["uf"], aliquotas["outros"])
+    imposto = round(base * aliq, 2)
+    
+    return imposto
+```

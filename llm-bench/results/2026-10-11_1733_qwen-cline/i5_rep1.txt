@@ -1,0 +1,5 @@
+Primeiro, calculamos o custo total: R$ 1.920,00 (materiais) + R$ 1.100,00 (mão de obra) + R$ 180,00 (frete) = **R$ 3.200,00**.  
+Depois, somamos comissão (5% de R$ 4.850 = R$ 242,50) e imposto (6% de R$ 4.850 = R$ 291,00), totalizando **R$ 533,50**.  
+O lucro bruto é R$ 4.850,00 - R$ 3.200,00 = **R$ 1.650,00**.  
+Subtraindo os custos adicionais (comissão e imposto), o lucro líquido é R$ 1.650,00 - R$ 533,50 = **R$ 1.116,50**.  
+A margem líquida é R$ 1.116,50 / R$ 4.850,00 ≈ **23%**.

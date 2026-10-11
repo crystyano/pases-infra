@@ -12,3 +12,5 @@ comfyui/
 tts/
 # Blender (1,6 GB; reconstruivel pelo blender-config/README.md)
 blender/
+# Ambiente de teste do llm-bench (pytest; reconstruivel pelo llm-bench/README.md)
+llm-bench/.venv/

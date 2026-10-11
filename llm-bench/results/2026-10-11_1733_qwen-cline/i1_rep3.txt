@@ -1,0 +1,105 @@
+```python
+from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
+from typing import List, Dict, Optional
+
+@dataclass(frozen=True)
+class Item:
+    descricao: str
+    quantidade: int
+    preco_unitario: Decimal
+
+class Orcamento:
+    def __init__(self, cliente: str, frete: Decimal = Decimal("0")) -> None:
+        cliente = cliente.strip()
+        if not cliente:
+            raise ValueError("Cliente não pode ser vazio")
+        self.cliente = cliente
+        
+        if frete < 0:
+            raise ValueError("Frete não pode ser negativo")
+        self.frete = frete
+        
+        self._itens: List[Dict] = []
+        self._descricao_map: Dict[str, int] = {}  # mapeia descrição normalizada para índice no _itens
+        self._desconto_percentual: Optional[Decimal] = None
+        self._desconto_valor: Optional[Decimal] = None
+
+    def adicionar_item(self, item: Item) -> None:
+        if not item.descricao.strip():
+            raise ValueError("Descrição do item não pode ser vazia")
+        if not isinstance(item.quantidade, int) or item.quantidade <= 0:
+            raise ValueError("Quantidade deve ser um inteiro maior que zero")
+        if not isinstance(item.preco_unitario, Decimal) or item.preco_unitario < 0:
+            raise ValueError("Preço unitário deve ser um Decimal maior ou igual a zero")
+
+        descricao_normalizada = item.descricao.strip().lower()
+        indice = self._descricao_map.get(descricao_normalizada)
+        
+        if indice is not None:
+            # Item já existe, verificar se o preço é o mesmo
+            item_existente = self._itens[indice]
+            if item_existente['preco_unitario'] != item.preco_unitario:
+                raise ValueError("Preço unitário inconsistente para item já adicionado")
+            # Somar quantidades
+            item_existente['quantidade'] += item.quantidade
+        else:
+            # Novo item
+            self._descricao_map[descricao_normalizada] = len(self._itens)
+            self._itens.append({
+                'descricao': item.descricao.strip(),
+                'quantidade': item.quantidade,
+                'preco_unitario': item.preco_unitario
+            })
+
+    def subtotal(self) -> Decimal:
+        total = Decimal("0.00")
+        for item in self._itens:
+            subtotal_item = item['quantidade'] * item['preco_unitario']
+            total += subtotal_item
+        return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    def aplicar_desconto(self, percentual: Decimal, aprovado: bool = False) -> None:
+        if not (0 <= percentual <= 100):
+            raise ValueError("Percentual deve estar entre 0 e 100")
+        if percentual > 15 and not aprovado:
+            raise PermissionError("Desconto acima de 15% requer aprovação")
+
+        self._desconto_percentual = percentual
+        subtotal = self.subtotal()
+        desconto = subtotal * percentual / Decimal("100")
+        self._desconto_valor = desconto.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    def total(self) -> Decimal:
+        subtotal = self.subtotal()
+        desconto = self._desconto_valor if self._desconto_valor is not None else Decimal("0.00")
+        total = subtotal - desconto + self.frete
+        return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    def to_dict(self) -> dict:
+        itens_saida = []
+        for item in self._itens:
+            subtotal_item = Decimal(str(item['quantidade'])) * item['preco_unitario']
+            subtotal_item = subtotal_item.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            itens_saida.append({
+                "descricao": item['descricao'],
+                "quantidade": item['quantidade'],
+                "preco_unitario": f"{item['preco_unitario']:.2f}",
+                "subtotal": f"{subtotal_item:.2f}"
+            })
+
+        subtotal = self.subtotal()
+        desconto_percentual = self._desconto_percentual if self._desconto_percentual is not None else Decimal("0.00")
+        desconto_valor = self._desconto_valor if self._desconto_valor is not None else Decimal("0.00")
+        total = self.total()
+
+        return {
+            "cliente": self.cliente,
+            "itens": itens_saida,
+            "subtotal": f"{subtotal:.2f}",
+            "desconto_percentual": f"{desconto_percentual:.2f}",
+            "desconto_valor": f"{desconto_valor:.2f}",
+            "frete": f"{self.frete:.2f}",
+            "total": f"{total:.2f}"
+        }
+```
