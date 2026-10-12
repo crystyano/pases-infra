@@ -1,0 +1,77 @@
+```python
+def calcular_pedido(pedido):
+    """
+    Calcula o total de um pedido, incluindo subtotal, frete, desconto, imposto e peso.
+    """
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+    
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+    frete = _calcular_frete(peso, cliente["uf"], cliente["tipo"], cupom)
+    desconto = _calcular_desconto(subtotal, cliente["tipo"], cupom)
+    imposto = _calcular_imposto(subtotal - desconto, cliente["uf"])
+    
+    total = round((subtotal - desconto) + imposto + frete, 2)
+    
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": round(frete, 2),
+        "imposto": imposto,
+        "total": total,
+        "peso_kg": round(peso, 2)
+    }
+
+def _calcular_subtotal_e_peso(itens):
+    """Calcula o subtotal e o peso total dos itens."""
+    subtotal = sum(item["preco"] * item["qtd"] for item in itens)
+    peso = sum(item["peso_kg"] * item["qtd"] for item in itens)
+    return round(subtotal, 2), peso
+
+def _calcular_frete(peso, uf, tipo_cliente, cupom):
+    """Calcula o frete com base em peso, região, tipo de cliente e cupom."""
+    if cupom == "FRETEGRATIS":
+        return 30 if peso > 50 else 0
+    
+    # Tabela de fretes por faixa de peso e UF
+    if peso <= 5:
+        frete_base = 20 if uf == "SP" else 35
+    elif peso <= 20:
+        frete_base = 45 if uf == "SP" else 70
+    else:
+        frete_base = 90 if uf == "SP" else 140
+    
+    if tipo_cliente == "VIP":
+        frete_base *= 0.5
+        
+    return frete_base
+
+def _calcular_desconto(subtotal, tipo_cliente, cupom):
+    """Calcula o desconto com base no subtotal, tipo de cliente e cupom."""
+    desconto = 0
+    
+    if cupom == "BEMVINDO10" and subtotal >= 200:
+        desconto += subtotal * 0.10
+        
+    if tipo_cliente == "VIP":
+        base_para_desconto_vip = subtotal - desconto
+        if subtotal >= 1000:
+            desconto += base_para_desconto_vip * 0.05
+        elif subtotal >= 500:
+            desconto += base_para_desconto_vip * 0.02
+            
+    return round(desconto, 2)
+
+def _calcular_imposto(base, uf):
+    """Calcula o imposto com base na base de cálculo e UF."""
+    ALIQUOTAS = {
+        "SP": 0.18,
+        "RJ": 0.20,
+        "MG": 0.18,
+        "OUTROS": 0.12
+    }
+    
+    aliquota = ALIQUOTAS.get(uf, ALIQUOTAS["OUTROS"])
+    return round(base * aliquota, 2)
+```

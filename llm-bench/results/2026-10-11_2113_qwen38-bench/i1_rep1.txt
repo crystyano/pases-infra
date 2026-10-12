@@ -1,0 +1,126 @@
+```python
+from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
+from typing import List, Optional
+
+
+@dataclass(frozen=True)
+class Item:
+    descricao: str
+    quantidade: int
+    preco_unitario: Decimal
+
+
+class Orcamento:
+    _TWO_PLACES = Decimal("0.01")
+
+    def __init__(self, cliente: str, frete: Decimal = Decimal("0")) -> None:
+        if not isinstance(cliente, str):
+            raise ValueError("cliente deve ser uma string")
+        cliente = cliente.strip()
+        if not cliente:
+            raise ValueError("cliente não pode ser vazio")
+
+        if not isinstance(frete, Decimal):
+            raise ValueError("frete deve ser Decimal")
+        if frete < 0:
+            raise ValueError("frete não pode ser negativo")
+
+        self._cliente: str = cliente
+        self._frete: Decimal = frete.quantize(self._TWO_PLACES, rounding=ROUND_HALF_UP)
+        self._itens: List[Item] = []
+        self._desconto_percentual: Decimal = Decimal("0")
+        self._desconto_valor: Decimal = Decimal("0")
+
+    def _round(self, value: Decimal) -> Decimal:
+        return value.quantize(self._TWO_PLACES, rounding=ROUND_HALF_UP)
+
+    def _normalize_descricao(self, descricao: str) -> str:
+        return descricao.strip().lower()
+
+    def adicionar_item(self, item: Item) -> None:
+        # Validar descricao
+        if not isinstance(item.descricao, str):
+            raise ValueError("descricao deve ser uma string")
+        descricao_limpa = item.descricao.strip()
+        if not descricao_limpa:
+            raise ValueError("descricao não pode ser vazia")
+
+        # Validar quantidade
+        if not isinstance(item.quantidade, int) or isinstance(item.quantidade, bool):
+            raise ValueError("quantidade deve ser int")
+        if item.quantidade <= 0:
+            raise ValueError("quantidade deve ser maior que zero")
+
+        # Validar preco_unitario
+        if not isinstance(item.preco_unitario, Decimal):
+            raise ValueError("preco_unitario deve ser Decimal")
+        if item.preco_unitario < 0:
+            raise ValueError("preco_unitario deve ser maior ou igual a zero")
+
+        chave = self._normalize_descricao(descricao_limpa)
+
+        # Procurar item existente com mesma descrição normalizada
+        for i, existente in enumerate(self._itens):
+            if self._normalize_descricao(existente.descricao) == chave:
+                if existente.preco_unitario != item.preco_unitario:
+                    raise ValueError("preco_unitario diferente para a mesma descrição")
+                # Somar quantidades, manter primeira descrição
+                self._itens[i] = Item(
+                    descricao=existente.descricao,
+                    quantidade=existente.quantidade + item.quantidade,
+                    preco_unitario=existente.preco_unitario,
+                )
+                return
+
+        # Novo item
+        self._itens.append(Item(
+            descricao=descricao_limpa,
+            quantidade=item.quantidade,
+            preco_unitario=item.preco_unitario,
+        ))
+
+    def subtotal(self) -> Decimal:
+        if not self._itens:
+            return Decimal("0.00")
+        total = Decimal("0")
+        for item in self._itens:
+            total += item.quantidade * item.preco_unitario
+        return self._round(total)
+
+    def aplicar_desconto(self, percentual: Decimal, aprovado: bool = False) -> None:
+        if not isinstance(percentual, Decimal):
+            raise ValueError("percentual deve ser Decimal")
+        if percentual < 0 or percentual > 100:
+            raise ValueError("percentual deve estar entre 0 e 100")
+        if percentual > Decimal("15") and not aprovado:
+            raise PermissionError("desconto acima de 15% exige aprovação")
+
+        self._desconto_percentual = percentual
+        sub = self.subtotal()
+        self._desconto_valor = self._round(sub * percentual / Decimal("100"))
+
+    def total(self) -> Decimal:
+        return self._round(self.subtotal() - self._desconto_valor + self._frete)
+
+    def to_dict(self) -> dict:
+        itens = []
+        for item in self._itens:
+            item_sub = self._round(item.quantidade * item.preco_unitario)
+            itens.append({
+                "descricao": item.descricao,
+                "quantidade": item.quantidade,
+                "preco_unitario": str(self._round(item.preco_unitario)),
+                "subtotal": str(item_sub),
+            })
+
+        return {
+            "cliente": self._cliente,
+            "itens": itens,
+            "subtotal": str(self.subtotal()),
+            "desconto_percentual": str(self._round(self._desconto_percentual)),
+            "desconto_valor": str(self._round(self._desconto_valor)),
+            "frete": str(self._round(self._frete)),
+            "total": str(self.total()),
+        }
+```

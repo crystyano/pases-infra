@@ -1,0 +1,158 @@
+```python
+"""Módulo de cálculo de pedidos com frete, cupons, descontos e impostos."""
+
+# Tabela de frete por faixa de peso (kg) e região (UF).
+# Estrutura: {faixa: {uf: valor}}
+FAIXAS_PESO = [
+    (5, "FAIXA_1"),   # <= 5 kg
+    (20, "FAIXA_2"),  # <= 20 kg
+    (float("inf"), "FAIXA_3"),  # > 20 kg
+]
+
+FRETE_POR_FAIXA = {
+    "FAIXA_1": {"SP": 20, "OUTRA": 35},
+    "FAIXA_2": {"SP": 45, "OUTRA": 70},
+    "FAIXA_3": {"SP": 90, "OUTRA": 140},
+}
+
+# Alíquotas de imposto por UF
+ALIQ_IMPOSTO = {
+    "SP": 0.18,
+    "RJ": 0.20,
+    "MG": 0.18,
+}
+ALIQ_PADRAO = 0.12
+
+# Cupons e regras
+CUPOM_FRETEGRATIS = "FRETEGRATIS"
+CUPOM_BEMVINDO10 = "BEMVINDO10"
+PESO_LIMITE_FRETEGRATIS = 50
+FRETE_MINIMO_FRETEGRATIS = 30
+
+# Descontos VIP
+VIP_DESCONTO_5 = 0.05
+VIP_DESCONTO_2 = 0.02
+VIP_LIMITE_5 = 1000
+VIP_LIMITE_2 = 500
+
+# Desconto BEMVINDO10
+BEMVINDO10_PORCENTAGEM = 0.10
+BEMVINDO10_MINIMO = 200
+
+
+def _calcular_subtotal_e_peso(itens):
+    """Calcula subtotal e peso total a partir da lista de itens."""
+    subtotal = 0
+    peso = 0
+    for item in itens:
+        subtotal += item["preco"] * item["qtd"]
+        peso += item["peso_kg"] * item["qtd"]
+    return round(subtotal, 2), round(peso, 2)
+
+
+def _determinar_faixa_peso(peso):
+    """Retorna a chave da faixa de peso correspondente."""
+    for limite, chave in FAIXAS_PESO:
+        if peso <= limite:
+            return chave
+    return "FAIXA_3"
+
+
+def _calcular_frete_base(peso, uf):
+    """Calcula o frete base conforme peso e UF."""
+    faixa = _determinar_faixa_peso(peso)
+    tabela = FRETE_POR_FAIXA[faixa]
+    return tabela["SP"] if uf == "SP" else tabela["OUTRA"]
+
+
+def _aplicar_desconto_vip_frete(frete):
+    """Aplica desconto de 50% no frete para clientes VIP."""
+    return frete * 0.5
+
+
+def _aplicar_cupom_frete(frete, cupom, peso):
+    """Aplica regras do cupom FRETEGRATIS."""
+    if cupom == CUPOM_FRETEGRATIS:
+        if peso > PESO_LIMITE_FRETEGRATIS:
+            return FRETE_MINIMO_FRETEGRATIS
+        return 0
+    return frete
+
+
+def _calcular_desconto_cupom(subtotal, cupom):
+    """Calcula desconto via cupom BEMVINDO10."""
+    if cupom == CUPOM_BEMVINDO10 and subtotal >= BEMVINDO10_MINIMO:
+        return subtotal * BEMVINDO10_PORCENTAGEM
+    return 0
+
+
+def _calcular_desconto_vip(subtotal, desconto_atual):
+    """Calcula desconto adicional para clientes VIP."""
+    base_para_desconto = subtotal - desconto_atual
+    if subtotal >= VIP_LIMITE_5:
+        return base_para_desconto * VIP_DESCONTO_5
+    if subtotal >= VIP_LIMITE_2:
+        return base_para_desconto * VIP_DESCONTO_2
+    return 0
+
+
+def _calcular_imposto(base, uf):
+    """Calcula o imposto conforme a UF."""
+    aliquota = ALIQ_IMPOSTO.get(uf, ALIQ_PADRAO)
+    return round(base * aliquota, 2)
+
+
+def calcular_pedido(pedido):
+    """
+    Calcula os valores de um pedido.
+
+    Args:
+        pedido: dict com chaves 'itens', 'cliente' e opcionalmente 'cupom'.
+
+    Returns:
+        dict com subtotal, desconto, frete, imposto, total e peso_kg.
+    """
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+    uf = cliente["uf"]
+    tipo_cliente = cliente["tipo"]
+
+    # 1. Subtotal e peso
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+
+    # 2. Frete base
+    frete = _calcular_frete_base(peso, uf)
+
+    # 3. Desconto VIP no frete
+    if tipo_cliente == "VIP":
+        frete = _aplicar_desconto_vip_frete(frete)
+
+    # 4. Cupom FRETEGRATIS
+    frete = _aplicar_cupom_frete(frete, cupom, peso)
+    frete = round(frete, 2)
+
+    # 5. Descontos
+    desconto = _calcular_desconto_cupom(subtotal, cupom)
+    if tipo_cliente == "VIP":
+        desconto += _calcular_desconto_vip(subtotal, desconto)
+    desconto = round(desconto, 2)
+
+    # 6. Base para imposto
+    base = subtotal - desconto
+
+    # 7. Imposto
+    imposto = _calcular_imposto(base, uf)
+
+    # 8. Total
+    total = round(base + imposto + frete, 2)
+
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": frete,
+        "imposto": imposto,
+        "total": total,
+        "peso_kg": peso,
+    }
+```

@@ -1,0 +1,80 @@
+```python
+def _calcular_area_chapa(ordem):
+    return ordem["chapa_w"] * ordem["chapa_h"]
+
+
+def _calcular_area_pecas(ordem):
+    return sum(p["w"] * p["h"] * p["qtd"] for p in ordem["pecas"])
+
+
+def _calcular_aproveitamento(ordem):
+    area_chapa = _calcular_area_chapa(ordem)
+    if area_chapa <= 0:
+        return 0
+    area_pecas = _calcular_area_pecas(ordem)
+    return round(area_pecas / area_chapa * 100, 1)
+
+
+def _classificar_status(aprov):
+    if aprov > 100:
+        return "INVALIDA"
+    elif aprov >= 85:
+        return "OTIMO"
+    elif aprov >= 70:
+        return "BOM"
+    elif aprov >= 50:
+        return "REGULAR"
+    else:
+        return "RUIM"
+
+
+def _precisa_revisar(ordem, aprov):
+    prioridade = ordem.get("prioridade", 3)
+    return prioridade == 1 and aprov < 70
+
+
+def _formatar_linha(id_ordem, status, aprov):
+    return f"{id_ordem} | {status} | {aprov}%"
+
+
+def _calcular_media(total_aprov, contagem):
+    if contagem > 0:
+        return round(total_aprov / contagem, 1)
+    return 0
+
+
+def resumo_producao(ordens):
+    linhas = []
+    revisar = []
+    total_aprov = 0
+    contagem = 0
+    dados = []
+
+    for ordem in ordens:
+        aprov = _calcular_aproveitamento(ordem)
+        status = _classificar_status(aprov)
+
+        if _precisa_revisar(ordem, aprov):
+            revisar.append(ordem["id"])
+
+        if status != "INVALIDA":
+            total_aprov += aprov
+            contagem += 1
+
+        prioridade = ordem.get("prioridade", 3)
+        dados.append((prioridade, -aprov, ordem["id"], status, aprov))
+
+    dados.sort()
+
+    for id_ordem, _, _, status, aprov in dados:
+        linhas.append(_formatar_linha(id_ordem, status, aprov))
+
+    media = _calcular_media(total_aprov, contagem)
+
+    return {
+        "linhas": linhas,
+        "media_aproveitamento": media,
+        "total_ordens": len(ordens),
+        "revisar": revisar
+    }
+```

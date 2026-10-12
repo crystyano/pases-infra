@@ -1,0 +1,100 @@
+```python
+TAXA_PIX_GRANDE = 0.05
+TAXA_PIX_PEQUENA = 0.03
+TAXA_BOLETO_3 = 0.0
+TAXA_BOLETO_6 = 0.015
+TAXA_BOLETO_12 = 0.025
+TAXA_CARTAO_SCORE_ALTO_6 = 0.0
+TAXA_CARTAO_SCORE_BAIXO_6 = 0.0199
+TAXA_CARTAO_SCORE_ALTO_12 = 0.0199
+TAXA_CARTAO_SCORE_BAIXO_12 = 0.0299
+LIMIAR_PIX_GRANDE = 1000
+SCORE_ALTO = 700
+ENTRADA_MINIMA_BOLETO = 0.2
+
+def _validar_parcelas(n):
+    if n < 1 or n > 12:
+        raise ValueError("parcelas invalidas")
+
+def _validar_entrada(entrada, valor):
+    if entrada < 0 or entrada >= valor:
+        raise ValueError("entrada invalida")
+
+def _validar_boleto(entrada, valor, n):
+    if n > 6 and entrada < valor * ENTRADA_MINIMA_BOLETO:
+        raise ValueError("entrada minima")
+
+def _calcular_taxa_pix(valor):
+    return TAXA_PIX_GRANDE if valor >= LIMIAR_PIX_GRANDE else TAXA_PIX_PEQUENA
+
+def _calcular_taxa_boleto(n):
+    if n <= 3:
+        return TAXA_BOLETO_3
+    elif n <= 6:
+        return TAXA_BOLETO_6
+    else:
+        return TAXA_BOLETO_12
+
+def _calcular_taxa_cartao(n, score):
+    if n <= 6:
+        return TAXA_CARTAO_SCORE_ALTO_6 if score >= SCORE_ALTO else TAXA_CARTAO_SCORE_BAIXO_6
+    else:
+        return TAXA_CARTAO_SCORE_ALTO_12 if score >= SCORE_ALTO else TAXA_CARTAO_SCORE_BAIXO_12
+
+def _calcular_taxa(forma, valor, n, score):
+    if forma == "PIX":
+        return _calcular_taxa_pix(valor)
+    elif forma == "BOLETO":
+        return _calcular_taxa_boleto(n)
+    elif forma == "CARTAO":
+        return _calcular_taxa_cartao(n, score)
+    else:
+        raise ValueError("forma invalida")
+
+def _calcular_total_financiado(financiado, taxa, n):
+    if taxa > 0:
+        return financiado * ((1 + taxa) ** n)
+    else:
+        return financiado
+
+def _gerar_parcelas(total, n):
+    valor_parcela = round(total / n, 2)
+    parcelas = [valor_parcela] * n
+    soma = round(valor_parcela * n, 2)
+    diferenca = round(total - soma, 2)
+    if diferenca != 0:
+        parcelas[n - 1] = round(parcelas[n - 1] + diferenca, 2)
+    return parcelas
+
+def calcular_parcelas(venda):
+    valor = venda["valor"]
+    entrada = venda.get("entrada", 0)
+    n = venda["parcelas"]
+    forma = venda["forma"]
+    score = venda.get("cliente_score", 0)
+
+    _validar_parcelas(n)
+    _validar_entrada(entrada, valor)
+
+    if forma == "BOLETO":
+        _validar_boleto(entrada, valor, n)
+
+    financiado = valor - entrada
+    taxa = _calcular_taxa(forma, valor, n, score)
+
+    if forma == "PIX":
+        n = 1
+
+    total = _calcular_total_financiado(financiado, taxa, n)
+    total = round(total, 2)
+    parcelas = _gerar_parcelas(total, n)
+
+    return {
+        "forma": forma,
+        "financiado": round(financiado, 2),
+        "taxa_mensal": taxa,
+        "parcelas": parcelas,
+        "total_final": round(entrada + total, 2),
+        "juros_total": round(total - financiado, 2)
+    }
+```

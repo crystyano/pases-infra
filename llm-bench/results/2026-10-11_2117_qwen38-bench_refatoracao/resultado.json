@@ -1,0 +1,426 @@
+{
+ "modelo": "qwen38-bench",
+ "parametros_modelfile": [
+  "PARAMETER top_k 20",
+  "PARAMETER top_p 0.8",
+  "PARAMETER draft_num_predict 4",
+  "PARAMETER min_p 0",
+  "PARAMETER num_ctx 32768",
+  "PARAMETER presence_penalty 0",
+  "PARAMETER repeat_penalty 1",
+  "PARAMETER temperature 0.7"
+ ],
+ "fixtures": {
+  "i2": [
+   {
+    "geracao": {
+     "ttft_s": 0.96,
+     "tokens": 677,
+     "tok_s": 69.2,
+     "prompt_tokens": 691,
+     "total_s": 10.7
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 21,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.28,
+     "tokens": 1461,
+     "tok_s": 65.6,
+     "prompt_tokens": 691,
+     "total_s": 22.5
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 53,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.3,
+     "tokens": 1104,
+     "tok_s": 65.6,
+     "prompt_tokens": 691,
+     "total_s": 17.1
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 30,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 1518,
+     "tok_s": 65.6,
+     "prompt_tokens": 691,
+     "total_s": 23.4
+    },
+    "teste": {
+     "passou": 72,
+     "total": 193,
+     "fracao": 0.37305699481865284,
+     "nota": "121 failed, 72 passed in 0.06s",
+     "falhas": 121,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 39,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": "E   NameError: name 'DESCOTO_BEMVINDO10_MINIMO' is not defined"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.28,
+     "tokens": 769,
+     "tok_s": 68.0,
+     "prompt_tokens": 691,
+     "total_s": 11.6
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 23,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   }
+  ],
+  "i2b": [
+   {
+    "geracao": {
+     "ttft_s": 1.0,
+     "tokens": 1009,
+     "tok_s": 69.9,
+     "prompt_tokens": 703,
+     "total_s": 15.4
+    },
+    "teste": {
+     "passou": 159,
+     "total": 241,
+     "fracao": 0.6597510373443983,
+     "nota": "82 failed, 159 passed in 0.06s",
+     "falhas": 82,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 10,
+     "maior_funcao_linhas": 31,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.3,
+     "tokens": 1142,
+     "tok_s": 68.5,
+     "prompt_tokens": 703,
+     "total_s": 17.0
+    },
+    "teste": {
+     "passou": 241,
+     "total": 241,
+     "fracao": 1.0,
+     "nota": "241 passed in 0.05s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 8,
+     "maior_funcao_linhas": 46,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.3,
+     "tokens": 1164,
+     "tok_s": 68.3,
+     "prompt_tokens": 703,
+     "total_s": 17.4
+    },
+    "teste": {
+     "passou": 241,
+     "total": 241,
+     "fracao": 1.0,
+     "nota": "241 passed in 0.05s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 10,
+     "maior_funcao_linhas": 40,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.3,
+     "tokens": 1172,
+     "tok_s": 68.7,
+     "prompt_tokens": 703,
+     "total_s": 17.4
+    },
+    "teste": {
+     "passou": 241,
+     "total": 241,
+     "fracao": 1.0,
+     "nota": "241 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 39,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 1159,
+     "tok_s": 69.6,
+     "prompt_tokens": 703,
+     "total_s": 16.9
+    },
+    "teste": {
+     "passou": 159,
+     "total": 241,
+     "fracao": 0.6597510373443983,
+     "nota": "82 failed, 159 passed in 0.06s",
+     "falhas": 82,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 27,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 56
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   }
+  ],
+  "i2c": [
+   {
+    "geracao": {
+     "ttft_s": 0.89,
+     "tokens": 634,
+     "tok_s": 71.6,
+     "prompt_tokens": 562,
+     "total_s": 9.7
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 6,
+     "maior_funcao_linhas": 14,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 892,
+     "tok_s": 67.9,
+     "prompt_tokens": 562,
+     "total_s": 13.4
+    },
+    "teste": {
+     "passou": 69,
+     "total": 141,
+     "fracao": 0.48936170212765956,
+     "nota": "72 failed, 69 passed in 0.04s",
+     "falhas": 72,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 7,
+     "maior_funcao_linhas": 36,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 602,
+     "tok_s": 72.9,
+     "prompt_tokens": 562,
+     "total_s": 8.5
+    },
+    "teste": {
+     "passou": 27,
+     "total": 141,
+     "fracao": 0.19148936170212766,
+     "nota": "114 failed, 27 passed in 0.05s",
+     "falhas": 114,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 8,
+     "maior_funcao_linhas": 34,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 444,
+     "tok_s": 76.8,
+     "prompt_tokens": 562,
+     "total_s": 6.1
+    },
+    "teste": {
+     "passou": 141,
+     "total": 141,
+     "fracao": 1.0,
+     "nota": "141 passed in 0.03s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40,
+     "melhorou_estrutura": false
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 676,
+     "tok_s": 70.4,
+     "prompt_tokens": 562,
+     "total_s": 9.9
+    },
+    "teste": {
+     "passou": 69,
+     "total": 141,
+     "fracao": 0.48936170212765956,
+     "nota": "72 failed, 69 passed in 0.04s",
+     "falhas": 72,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 31,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 40
+    },
+    "primeiro_erro": "E   AssertionError: assert False"
+   }
+  ]
+ }
+}

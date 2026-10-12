@@ -1,0 +1,188 @@
+[
+ {
+  "role": "system",
+  "content": "Você é um agente de programação que trabalha em um repositório Python usando as ferramentas fornecidas. Responda em português."
+ },
+ {
+  "role": "user",
+  "content": "Neste repositório (módulos `modelos.py`, `estoque.py`, `relatorio.py` e os testes `test_basico.py`) implemente a **reserva de chapas** no estoque.\n\nRequisitos:\n\n1. `Estoque.reservar(sku, qtd)` reserva `qtd` chapas **sem tirá-las do estoque físico**. `KeyError` se o sku não existir; `ValueError` se `qtd <= 0`; `ValueError(\"estoque insuficiente\")` se `qtd` for maior que o disponível.\n2. `Estoque.liberar_reserva(sku, qtd)` desfaz parte da reserva. `ValueError(\"reserva insuficiente\")` se `qtd` for maior que o reservado; `ValueError` se `qtd <= 0`.\n3. `Estoque.quantidade(sku)` continua sendo o **total físico**. Novos métodos: `Estoque.reservado(sku)` e `Estoque.disponivel(sku)` (disponível = total − reservado). Para sku inexistente os dois retornam `0`.\n4. `Estoque.retirar(sku, qtd)` só pode retirar do **disponível** (a parte reservada fica protegida): se `qtd` for maior que o disponível, `ValueError(\"estoque insuficiente\")`.\n5. O relatório muda de formato. Cabeçalho exato: `SKU | Descrição | Total | Reservado | Disp.` e cada linha `sku | descrição | total | reservado | disponível` (separador ` | `, linhas unidas por `\\n`, sem linha final em branco).\n\nAtualize os testes existentes se o comportamento mudar. Use as ferramentas para ler e alterar os arquivos e **rode os testes antes de terminar**. Quando acabar, responda com um resumo curto.\n"
+ },
+ {
+  "role": "assistant",
+  "content": "",
+  "tool_calls": [
+   {
+    "id": "call_886x61k6",
+    "function": {
+     "index": 0,
+     "name": "list_files",
+     "arguments": {}
+    }
+   }
+  ]
+ },
+ {
+  "role": "tool",
+  "tool_name": "list_files",
+  "content": "estoque.py\nmodelos.py\nrelatorio.py\ntest_basico.py"
+ },
+ {
+  "role": "assistant",
+  "content": "",
+  "tool_calls": [
+   {
+    "id": "call_4tn3kdx3",
+    "function": {
+     "index": 0,
+     "name": "read_file",
+     "arguments": {
+      "path": "estoque.py"
+     }
+    }
+   },
+   {
+    "id": "call_wluoqeuy",
+    "function": {
+     "index": 1,
+     "name": "read_file",
+     "arguments": {
+      "path": "modelos.py"
+     }
+    }
+   },
+   {
+    "id": "call_j1b257kz",
+    "function": {
+     "index": 2,
+     "name": "read_file",
+     "arguments": {
+      "path": "relatorio.py"
+     }
+    }
+   },
+   {
+    "id": "call_agvyuatr",
+    "function": {
+     "index": 3,
+     "name": "read_file",
+     "arguments": {
+      "path": "test_basico.py"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "role": "tool",
+  "tool_name": "read_file",
+  "content": "from modelos import Chapa\n\n\nclass Estoque:\n    def __init__(self):\n        self._chapas = {}\n\n    def adicionar(self, chapa: Chapa):\n        if chapa.quantidade <= 0:\n            raise ValueError(\"quantidade invalida\")\n        atual = self._chapas.get(chapa.sku)\n        if atual is not None:\n            atual.quantidade += chapa.quantidade\n        else:\n            self._chapas[chapa.sku] = Chapa(chapa.sku, chapa.descricao, chapa.quantidade)\n\n    def retirar(self, sku: str, qtd: int):\n        if sku not in self._chapas:\n            raise KeyError(sku)\n        if qtd <= 0 or qtd > self._chapas[sku].quantidade:\n            raise ValueError(\"estoque insuficiente\")\n        self._chapas[sku].quantidade -= qtd\n\n    def quantidade(self, sku: str) -> int:\n        chapa = self._chapas.get(sku)\n        return chapa.quantidade if chapa else 0\n\n    def listar(self):\n        return sorted(self._chapas.values(), key=lambda c: c.sku)\n"
+ },
+ {
+  "role": "tool",
+  "tool_name": "read_file",
+  "content": "from dataclasses import dataclass\n\n\n@dataclass\nclass Chapa:\n    sku: str\n    descricao: str\n    quantidade: int\n"
+ },
+ {
+  "role": "tool",
+  "tool_name": "read_file",
+  "content": "def gerar_relatorio(estoque) -> str:\n    linhas = [\"SKU | Descrição | Qtd\"]\n    for chapa in estoque.listar():\n        linhas.append(f\"{chapa.sku} | {chapa.descricao} | {chapa.quantidade}\")\n    return \"\\n\".join(linhas)\n"
+ },
+ {
+  "role": "tool",
+  "tool_name": "read_file",
+  "content": "import pytest\nfrom estoque import Estoque\nfrom modelos import Chapa\nfrom relatorio import gerar_relatorio\n\n\ndef novo():\n    e = Estoque()\n    e.adicionar(Chapa(\"MDF-15\", \"MDF 15mm branco\", 10))\n    return e\n\n\ndef test_adicionar_soma_quantidades():\n    e = novo()\n    e.adicionar(Chapa(\"MDF-15\", \"MDF 15mm branco\", 5))\n    assert e.quantidade(\"MDF-15\") == 15\n\n\ndef test_retirar():\n    e = novo()\n    e.retirar(\"MDF-15\", 4)\n    assert e.quantidade(\"MDF-15\") == 6\n\n\ndef test_retirar_demais():\n    with pytest.raises(ValueError):\n        novo().retirar(\"MDF-15\", 11)\n\n\ndef test_relatorio():\n    assert gerar_relatorio(novo()) == \"SKU | Descrição | Qtd\\nMDF-15 | MDF 15mm branco | 10\"\n"
+ },
+ {
+  "role": "assistant",
+  "content": "",
+  "tool_calls": [
+   {
+    "id": "call_28e91q8i",
+    "function": {
+     "index": 0,
+     "name": "write_file",
+     "arguments": {
+      "path": "modelos.py",
+      "content": "from dataclasses import dataclass, field\n\n\n@dataclass\nclass Chapa:\n    sku: str\n    descricao: str\n    quantidade: int\n    reservado: int = field(default=0)\n"
+     }
+    }
+   },
+   {
+    "id": "call_2zjo88rs",
+    "function": {
+     "index": 1,
+     "name": "write_file",
+     "arguments": {
+      "path": "estoque.py",
+      "content": "from modelos import Chapa\n\n\nclass Estoque:\n    def __init__(self):\n        self._chapas = {}\n\n    def adicionar(self, chapa: Chapa):\n        if chapa.quantidade <= 0:\n            raise ValueError(\"quantidade invalida\")\n        atual = self._chapas.get(chapa.sku)\n        if atual is not None:\n            atual.quantidade += chapa.quantidade\n        else:\n            self._chapas[chapa.sku] = Chapa(chapa.sku, chapa.descricao, chapa.quantidade)\n\n    def reservar(self, sku: str, qtd: int):\n        if sku not in self._chapas:\n            raise KeyError(sku)\n        if qtd <= 0:\n            raise ValueError(\"quantidade invalida\")\n        chapa = self._chapas[sku]\n        if qtd > chapa.quantidade - chapa.reservado:\n            raise ValueError(\"estoque insuficiente\")\n        chapa.reservado += qtd\n\n    def liberar_reserva(self, sku: str, qtd: int):\n        if sku not in self._chapas:\n            raise KeyError(sku)\n        if qtd <= 0:\n            raise ValueError(\"quantidade invalida\")\n        chapa = self._chapas[sku]\n        if qtd > chapa.reservado:\n            raise ValueError(\"reserva insuficiente\")\n        chapa.reservado -= qtd\n\n    def retirar(self, sku: str, qtd: int):\n        if sku not in self._chapas:\n            raise KeyError(sku)\n        if qtd <= 0:\n            raise ValueError(\"quantidade invalida\")\n        chapa = self._chapas[sku]\n        if qtd > chapa.quantidade - chapa.reservado:\n            raise ValueError(\"estoque insuficiente\")\n        chapa.quantidade -= qtd\n\n    def quantidade(self, sku: str) -> int:\n        chapa = self._chapas.get(sku)\n        return chapa.quantidade if chapa else 0\n\n    def reservado(self, sku: str) -> int:\n        chapa = self._chapas.get(sku)\n        return chapa.reservado if chapa else 0\n\n    def disponivel(self, sku: str) -> int:\n        chapa = self._chapas.get(sku)\n        return chapa.quantidade - chapa.reservado if chapa else 0\n\n    def listar(self):\n        return sorted(self._chapas.values(), key=lambda c: c.sku)\n"
+     }
+    }
+   },
+   {
+    "id": "call_d3p5jllo",
+    "function": {
+     "index": 2,
+     "name": "write_file",
+     "arguments": {
+      "path": "relatorio.py",
+      "content": "def gerar_relatorio(estoque) -> str:\n    linhas = [\"SKU | Descrição | Total | Reservado | Disp.\"]\n    for chapa in estoque.listar():\n        disp = chapa.quantidade - chapa.reservado\n        linhas.append(f\"{chapa.sku} | {chapa.descricao} | {chapa.quantidade} | {chapa.reservado} | {disp}\")\n    return \"\\n\".join(linhas)\n"
+     }
+    }
+   },
+   {
+    "id": "call_ofh10ec2",
+    "function": {
+     "index": 3,
+     "name": "write_file",
+     "arguments": {
+      "path": "test_basico.py",
+      "content": "import pytest\nfrom estoque import Estoque\nfrom modelos import Chapa\nfrom relatorio import gerar_relatorio\n\n\ndef novo():\n    e = Estoque()\n    e.adicionar(Chapa(\"MDF-15\", \"MDF 15mm branco\", 10))\n    return e\n\n\ndef test_adicionar_soma_quantidades():\n    e = novo()\n    e.adicionar(Chapa(\"MDF-15\", \"MDF 15mm branco\", 5))\n    assert e.quantidade(\"MDF-15\") == 15\n\n\ndef test_retirar():\n    e = novo()\n    e.retirar(\"MDF-15\", 4)\n    assert e.quantidade(\"MDF-15\") == 6\n\n\ndef test_retirar_demais():\n    with pytest.raises(ValueError):\n        novo().retirar(\"MDF-15\", 11)\n\n\ndef test_relatorio():\n    assert (\n        gerar_relatorio(novo())\n        == \"SKU | Descrição | Total | Reservado | Disp.\\nMDF-15 | MDF 15mm branco | 10 | 0 | 10\"\n    )\n\n\ndef test_reservar():\n    e = novo()\n    e.reservar(\"MDF-15\", 4)\n    assert e.quantidade(\"MDF-15\") == 10\n    assert e.reservado(\"MDF-15\") == 4\n    assert e.disponivel(\"MDF-15\") == 6\n\n\ndef test_reservar_sku_inexistente():\n    with pytest.raises(KeyError):\n        novo().reservar(\"NAO-EXISTE\", 1)\n\n\ndef test_reservar_qtd_invalida():\n    with pytest.raises(ValueError):\n        novo().reservar(\"MDF-15\", 0)\n    with pytest.raises(ValueError):\n        novo().reservar(\"MDF-15\", -1)\n\n\ndef test_reservar_estoque_insuficiente():\n    with pytest.raises(ValueError, match=\"estoque insuficiente\"):\n        novo().reservar(\"MDF-15\", 11)\n\n\ndef test_liberar_reserva():\n    e = novo()\n    e.reservar(\"MDF-15\", 6)\n    e.liberar_reserva(\"MDF-15\", 2)\n    assert e.reservado(\"MDF-15\") == 4\n    assert e.disponivel(\"MDF-15\") == 6\n\n\ndef test_liberar_reserva_insuficiente():\n    e = novo()\n    e.reservar(\"MDF-15\", 3)\n    with pytest.raises(ValueError, match=\"reserva insuficiente\"):\n        e.liberar_reserva(\"MDF-15\", 4)\n\n\ndef test_liberar_reserva_qtd_invalida():\n    with pytest.raises(ValueError):\n        novo().liberar_reserva(\"MDF-15\", 0)\n\n\ndef test_retirar_protege_reservado():\n    e = novo()\n    e.reservar(\"MDF-15\", 6)\n    with pytest.raises(ValueError, match=\"estoque insuficiente\"):\n        e.retirar(\"MDF-15\", 5)\n    e.retirar(\"MDF-15\", 4)\n    assert e.quantidade(\"MDF-15\") == 6\n    assert e.reservado(\"MDF-15\") == 6\n    assert e.disponivel(\"MDF-15\") == 0\n\n\ndef test_sku_inexistente_retorna_zero():\n    e = novo()\n    assert e.reservado(\"NAO-EXISTE\") == 0\n    assert e.disponivel(\"NAO-EXISTE\") == 0\n"
+     }
+    }
+   }
+  ]
+ },
+ {
+  "role": "tool",
+  "tool_name": "write_file",
+  "content": "ok: modelos.py gravado (157 caracteres)"
+ },
+ {
+  "role": "tool",
+  "tool_name": "write_file",
+  "content": "ok: estoque.py gravado (2000 caracteres)"
+ },
+ {
+  "role": "tool",
+  "tool_name": "write_file",
+  "content": "ok: relatorio.py gravado (320 caracteres)"
+ },
+ {
+  "role": "tool",
+  "tool_name": "write_file",
+  "content": "ok: test_basico.py gravado (2328 caracteres)"
+ },
+ {
+  "role": "assistant",
+  "content": "",
+  "tool_calls": [
+   {
+    "id": "call_vaa29a2o",
+    "function": {
+     "index": 0,
+     "name": "run_tests",
+     "arguments": {}
+    }
+   }
+  ]
+ },
+ {
+  "role": "tool",
+  "tool_name": "run_tests",
+  "content": ".............                                                            [100%]\n13 passed in 0.01s\n"
+ },
+ {
+  "role": "assistant",
+  "content": "Todos os 13 testes passaram. Resumo das mudanças:\n\n- **`modelos.py`**: `Chapa` ganhou o campo `reservado` (default `0`, via `field`).\n- **`estoque.py`**:\n  - `reservar(sku, qtd)`: reserva sem tirar do físico; `KeyError` se sku não existe, `ValueError` se `qtd <= 0` ou `ValueError(\"estoque insuficiente\")` se excede o disponível.\n  - `liberar_reserva(sku, qtd)`: desfaz reserva; `ValueError(\"reserva insuficiente\")` se excede o reservado, `ValueError` se `qtd <= 0`.\n  - `retirar(sku, qtd)`: agora só retira do **disponível** (total − reservado); `ValueError(\"estoque insuficiente\")` caso contrário.\n  - Novos métodos `reservado(sku)` e `disponivel(sku)`, ambos retornando `0` para sku inexistente; `quantidade(sku)` continua sendo o total físico.\n- **`relatorio.py`**: novo cabeçalho `SKU | Descrição | Total | Reservado | Disp.` e linhas com total, reservado e disponível, unidas por `\\n` sem linha final em branco.\n- **`test_basico.py`**: teste de relatório atualizado e novos testes cobrindo reserva, liberação, proteção do reservado na retirada e casos de erro."
+ }
+]

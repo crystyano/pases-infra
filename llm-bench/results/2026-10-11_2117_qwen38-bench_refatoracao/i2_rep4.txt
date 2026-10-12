@@ -1,0 +1,152 @@
+```python
+"""Módulo de cálculo de pedidos."""
+
+# Tabelas de configuração
+FRETE_POR_FAIXA = {
+    (True, "SP"): 20,   # peso <= 5, SP
+    (True, "OUTROS"): 35, # peso <= 5, outros
+    (False, "SP"): 45,   # peso > 5 e <= 20, SP
+    (False, "OUTROS"): 70, # peso > 5 e <= 20, outros
+    (None, "SP"): 90,     # peso > 20, SP
+    (None, "OUTROS"): 140, # peso > 20, outros
+}
+
+ALIQ_IMPOSTO_POR_UF = {
+    "SP": 0.18,
+    "RJ": 0.20,
+    "MG": 0.18,
+    "OUTROS": 0.12,
+}
+
+CUPOM_FRETE_GRATIS = "FRETEGRATIS"
+CUPOM_BEMVINDO10 = "BEMVINDO10"
+
+LIMITE_PESO_FRETE_GRATIS = 50
+TAXA_FRETE_GRATIS_EXCEDENTE = 30
+
+DESCONTO_BEMVINDO10_MINIMO = 200
+DESCONTO_BEMVINDO10_PERCENTUAL = 0.10
+
+DESCONTO_VIP_NIVEL1_MINIMO = 1000
+DESCONTO_VIP_NIVEL1_PERCENTUAL = 0.05
+DESCONTO_VIP_NIVEL2_MINIMO = 500
+DESCONTO_VIP_NIVEL2_PERCENTUAL = 0.02
+
+DESCONTO_VIP_FRETE_PERCENTUAL = 0.5
+
+
+def _calcular_subtotal_e_peso(itens):
+    """Calcula subtotal e peso total dos itens."""
+    subtotal = 0
+    peso = 0
+    for item in itens:
+        subtotal += item["preco"] * item["qtd"]
+        peso += item["peso_kg"] * item["qtd"]
+    return round(subtotal, 2), round(peso, 2)
+
+
+def _determinar_faixa_peso(peso):
+    """Determina a faixa de peso para cálculo de frete."""
+    if peso <= 5:
+        return "FAIXA_1"
+    elif peso <= 20:
+        return "FAIXA_2"
+    else:
+        return "FAIXA_3"
+
+
+def _calcular_frete_base(peso, uf):
+    """Calcula o frete base com base no peso e UF."""
+    faixa = _determinar_faixa_peso(peso)
+    chave_uf = "SP" if uf == "SP" else "OUTROS"
+    
+    # Mapeia faixa para índice na tabela
+    if faixa == "FAIXA_1":
+        return FRETE_POR_FAIXA[(True, chave_uf)]
+    elif faixa == "FAIXA_2":
+        return FRETE_POR_FAIXA[(False, chave_uf)]
+    else:
+        return FRETE_POR_FAIXA[(None, chave_uf)]
+
+
+def _aplicar_desconto_vip_frete(frete, tipo_cliente):
+    """Aplica desconto VIP no frete."""
+    if tipo_cliente == "VIP":
+        return frete * DESCOTO_VIP_FRETE_PERCENTUAL
+    return frete
+
+
+def _aplicar_cupom_frete_gratis(frete, cupom, peso):
+    """Aplica regra de frete grátis com cupom."""
+    if cupom == CUPOM_FRETE_GRATIS:
+        if peso > LIMITE_PESO_FRETE_GRATIS:
+            return TAXA_FRETE_GRATIS_EXCEDENTE
+        else:
+            return 0
+    return frete
+
+
+def _calcular_desconto_cupom(subtotal, cupom):
+    """Calcula desconto por cupom BEMVINDO10."""
+    if cupom == CUPOM_BEMVINDO10 and subtotal >= DESCOTO_BEMVINDO10_MINIMO:
+        return subtotal * DESCOTO_BEMVINDO10_PERCENTUAL
+    return 0
+
+
+def _calcular_desconto_vip(subtotal, tipo_cliente, desconto_atual):
+    """Calcula desconto adicional para cliente VIP."""
+    if tipo_cliente != "VIP":
+        return 0
+    
+    if subtotal >= DESCOTO_VIP_NIVEL1_MINIMO:
+        return (subtotal - desconto_atual) * DESCOTO_VIP_NIVEL1_PERCENTUAL
+    elif subtotal >= DESCOTO_VIP_NIVEL2_MINIMO:
+        return (subtotal - desconto_atual) * DESCOTO_VIP_NIVEL2_PERCENTUAL
+    return 0
+
+
+def _obter_aliquota_imposto(uf):
+    """Obtém a alíquota de imposto para a UF."""
+    return ALIQ_IMPOSTO_POR_UF.get(uf, ALIQ_IMPOSTO_POR_UF["OUTROS"])
+
+
+def calcular_pedido(pedido):
+    """
+    Calcula o total do pedido incluindo subtotal, desconto, frete, imposto e total.
+    
+    Args:
+        pedido: dict com chaves "itens", "cliente", e opcionalmente "cupom"
+        
+    Returns:
+        dict com "subtotal", "desconto", "frete", "imposto", "total", "peso_kg"
+    """
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+    
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+    
+    frete = _calcular_frete_base(peso, cliente["uf"])
+    frete = _aplicar_desconto_vip_frete(frete, cliente["tipo"])
+    frete = _aplicar_cupom_frete_gratis(frete, cupom, peso)
+    
+    desconto = _calcular_desconto_cupom(subtotal, cupom)
+    desconto += _calcular_desconto_vip(subtotal, cliente["tipo"], desconto)
+    desconto = round(desconto, 2)
+    
+    base = subtotal - desconto
+    
+    aliquota = _obter_aliquota_imposto(cliente["uf"])
+    imposto = round(base * aliquota, 2)
+    
+    total = round(base + imposto + frete, 2)
+    
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": round(frete, 2),
+        "imposto": imposto,
+        "total": total,
+        "peso_kg": peso
+    }
+```

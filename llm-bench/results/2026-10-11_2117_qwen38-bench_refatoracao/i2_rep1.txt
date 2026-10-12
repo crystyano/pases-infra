@@ -1,0 +1,77 @@
+```python
+def calcular_pedido(pedido):
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+    frete = _calcular_frete(peso, cliente["uf"], cliente["tipo"], cupom)
+    desconto = _calcular_desconto(subtotal, cliente["tipo"], cupom)
+
+    base = subtotal - desconto
+    imposto = round(base * _aliquota_imposto(cliente["uf"]), 2)
+    total = round(base + imposto + frete, 2)
+
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": round(frete, 2),
+        "imposto": imposto,
+        "total": total,
+        "peso_kg": round(peso, 2),
+    }
+
+
+def _calcular_subtotal_e_peso(itens):
+    subtotal = sum(item["preco"] * item["qtd"] for item in itens)
+    peso = sum(item["peso_kg"] * item["qtd"] for item in itens)
+    return round(subtotal, 2), peso
+
+
+def _calcular_frete(peso, uf, tipo_cliente, cupom):
+    if cupom == "FRETEGRATIS":
+        return 30.0 if peso > 50 else 0.0
+
+    tabela_frete = {
+        "SP": {5: 20, 20: 45, "max": 90},
+        "default": {5: 35, 20: 70, "max": 140},
+    }
+    faixa = tabela_frete.get(uf, tabela_frete["default"])
+
+    if peso <= 5:
+        frete = faixa[5]
+    elif peso <= 20:
+        frete = faixa[20]
+    else:
+        frete = faixa["max"]
+
+    if tipo_cliente == "VIP":
+        frete *= 0.5
+
+    return frete
+
+
+def _calcular_desconto(subtotal, tipo_cliente, cupom):
+    desconto = 0.0
+
+    if cupom == "BEMVINDO10" and subtotal >= 200:
+        desconto = subtotal * 0.10
+
+    if tipo_cliente == "VIP":
+        base_desconto = subtotal - desconto
+        if subtotal >= 1000:
+            desconto += base_desconto * 0.05
+        elif subtotal >= 500:
+            desconto += base_desconto * 0.02
+
+    return round(desconto, 2)
+
+
+def _aliquota_imposto(uf):
+    tabela_aliquotas = {
+        "SP": 0.18,
+        "RJ": 0.20,
+        "MG": 0.18,
+    }
+    return tabela_aliquotas.get(uf, 0.12)
+```

@@ -1,0 +1,92 @@
+```python
+STATUS_INVALIDA = "INVALIDA"
+STATUS_OTIMO = "OTIMO"
+STATUS_BOM = "BOM"
+STATUS_REGULAR = "REGULAR"
+STATUS_RUIM = "RUIM"
+
+LIMIAR_OTIMO = 85
+LIMIAR_BOM = 70
+LIMIAR_REGULAR = 50
+
+PRIORIDADE_PADRAO = 3
+PRIORIDADE_ALTA = 1
+
+
+def _area_chapa(ordem):
+    return ordem["chapa_w"] * ordem["chapa_h"]
+
+
+def _area_pecas(ordem):
+    return sum(p["w"] * p["h"] * p["qtd"] for p in ordem["pecas"])
+
+
+def _aproveitamento(ordem):
+    area_chapa = _area_chapa(ordem)
+    if area_chapa <= 0:
+        return 0.0
+    return round(_area_pecas(ordem) / area_chapa * 100, 1)
+
+
+def _status(aprov):
+    if aprov > 100:
+        return STATUS_INVALIDA
+    if aprov >= LIMIAR_OTIMO:
+        return STATUS_OTIMO
+    if aprov >= LIMIAR_BOM:
+        return STATUS_BOM
+    if aprov >= LIMIAR_REGULAR:
+        return STATUS_REGULAR
+    return STATUS_RUIM
+
+
+def _prioridade(ordem):
+    return ordem.get("prioridade", PRIORIDADE_PADRAO)
+
+
+def _precisa_revisao(ordem, aprov):
+    return _prioridade(ordem) == PRIORIDADE_ALTA and aprov < LIMIAR_BOM
+
+
+def _linha_formatada(id_ordem, status, aprov):
+    return f"{id_ordem} | {status} | {aprov}%"
+
+
+def _media_aproveitamento(total_aprov, contagem):
+    if contagem == 0:
+        return 0
+    return round(total_aprov / contagem, 1)
+
+
+def resumo_producao(ordens):
+    linhas = []
+    revisar = []
+    total_aprov = 0.0
+    contagem = 0
+    registros = []
+
+    for ordem in ordens:
+        aprov = _aproveitamento(ordem)
+        status = _status(aprov)
+
+        if _precisa_revisao(ordem, aprov):
+            revisar.append(ordem["id"])
+
+        if status != STATUS_INVALIDA:
+            total_aprov += aprov
+            contagem += 1
+
+        registros.append((_prioridade(ordem), -aprov, ordem["id"], status, aprov))
+
+    registros.sort()
+
+    for _, _, id_ordem, status, aprov in registros:
+        linhas.append(_linha_formatada(id_ordem, status, aprov))
+
+    return {
+        "linhas": linhas,
+        "media_aproveitamento": _media_aproveitamento(total_aprov, contagem),
+        "total_ordens": len(ordens),
+        "revisar": revisar,
+    }
+```

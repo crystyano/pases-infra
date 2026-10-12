@@ -14,6 +14,7 @@ PY = str(HERE / ".venv/bin/python")
 OLLAMA = "http://127.0.0.1:11434"
 N_ESPERADO = {"i1": 23, "i2": 193, "i6": 12}     # testes ocultos de cada item (confirmados por --validar)
 MAX_PASSOS = 20
+THINK = {"off": False, "on": True}.get(os.environ.get("BENCH_THINK", ""))   # None = padrao do modelo; BENCH_THINK=off/on forca o modo de raciocinio (modelos com "thinking")
 
 
 # ------------------------------------------------------------------ Ollama
@@ -21,10 +22,14 @@ def _req(path, dados):
     return urllib.request.Request(OLLAMA + path, json.dumps(dados).encode(), {"Content-Type": "application/json"})
 
 
+def _think():
+    return {} if THINK is None else {"think": THINK}
+
+
 def gerar_stream(modelo, mensagens, opcoes):
     """/api/chat em streaming; mede o tempo ate o 1o token e a velocidade de geracao."""
     t0 = time.time(); ttft = None; partes = []; fim = {}
-    with urllib.request.urlopen(_req("/api/chat", {"model": modelo, "messages": mensagens, "stream": True, "options": opcoes}), timeout=900) as r:
+    with urllib.request.urlopen(_req("/api/chat", {"model": modelo, "messages": mensagens, "stream": True, "options": opcoes, **_think()}), timeout=900) as r:
         for linha in r:
             if not linha.strip():
                 continue
@@ -42,7 +47,7 @@ def gerar_stream(modelo, mensagens, opcoes):
 
 def chat_ferramentas(modelo, mensagens, ferramentas, opcoes):
     t0 = time.time()
-    with urllib.request.urlopen(_req("/api/chat", {"model": modelo, "messages": mensagens, "tools": ferramentas, "stream": False, "options": opcoes}), timeout=900) as r:
+    with urllib.request.urlopen(_req("/api/chat", {"model": modelo, "messages": mensagens, "tools": ferramentas, "stream": False, "options": opcoes, **_think()}), timeout=900) as r:
         d = json.load(r)
     ev, evd = d.get("eval_count", 0), d.get("eval_duration", 1)
     return d["message"], {"tokens": ev, "tok_s": ev / (evd / 1e9) if ev else 0, "total_s": time.time() - t0}
@@ -314,7 +319,7 @@ def main():
     curtos = [gerar_stream(a.modelo, [{"role": "user", "content": "Responda apenas: pronto"}], {**opcoes, "seed": s}) for s in range(1, 6)]
     ttft_curto = statistics.median(c["ttft_s"] for c in curtos if c["ttft_s"])
     print("TTFT a quente (prompt curto), mediana:", round(ttft_curto, 2), "s", flush=True)
-    resultado = {"modelo": a.modelo, "run": run, "parametros_modelfile": params, "opcoes_runner": opcoes, "carga_fria": carga, "ollama_ps": ps, "ttft_curto_mediana_s": round(ttft_curto, 2), "itens": {"i1": [], "i2": [], "i5": [], "i6": []}}
+    resultado = {"modelo": a.modelo, "run": run, "parametros_modelfile": params, "opcoes_runner": opcoes, "think": THINK, "carga_fria": carga, "ollama_ps": ps, "ttft_curto_mediana_s": round(ttft_curto, 2), "itens": {"i1": [], "i2": [], "i5": [], "i6": []}}
     for rep in range(1, a.reps + 1):
         for nome, fn in [("i1", item1), ("i2", item2), ("i5", item5), ("i6", item6)]:
             t0 = time.time()

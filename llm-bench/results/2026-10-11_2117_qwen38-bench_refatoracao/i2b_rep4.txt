@@ -1,0 +1,121 @@
+```python
+from typing import Dict, List
+
+# Constantes de configuração
+LIMITE_PARCELAS = 12
+PERCENTUAL_MINIMO_ENTRADA_BOLETO = 0.2
+DESCONTO_PIX_ALTO_VALOR = 0.05
+DESCONTO_PIX_BAIXO_VALOR = 0.03
+LIMITE_VALOR_PIX_DESCONTO = 1000
+
+# Tabelas de taxas por forma de pagamento
+TAXAS_BOLETO = {
+    "max_3": 0.0,
+    "max_6": 0.015,
+    "max_12": 0.025
+}
+
+TAXAS_CARTAO = {
+    "max_6_score_alto": 0.0,
+    "max_6_score_baixo": 0.0199,
+    "acima_6_score_alto": 0.0199,
+    "acima_6_score_baixo": 0.0299
+}
+
+SCORE_ALTO = 700
+
+
+def _validar_parcelas(n: int) -> None:
+    if n < 1 or n > LIMITE_PARCELAS:
+        raise ValueError("parcelas invalidas")
+
+
+def _validar_entrada(entrada: float, valor: float) -> None:
+    if entrada < 0 or entrada >= valor:
+        raise ValueError("entrada invalida")
+
+
+def _validar_entrada_boleto(entrada: float, valor: float, n: int) -> None:
+    if n > 6 and entrada < valor * PERCENTUAL_MINIMO_ENTRADA_BOLETO:
+        raise ValueError("entrada minima")
+
+
+def _calcular_desconto_pix(financiado: float, valor: float) -> float:
+    if valor >= LIMITE_VALOR_PIX_DESCONTO:
+        return financiado - (financiado * DESCONTO_PIX_ALTO_VALOR)
+    return financiado - (financiado * DESCONTO_PIX_BAIXO_VALOR)
+
+
+def _obter_taxa_boleto(n: int) -> float:
+    if n <= 3:
+        return TAXAS_BOLETO["max_3"]
+    elif n <= 6:
+        return TAXAS_BOLETO["max_6"]
+    return TAXAS_BOLETO["max_12"]
+
+
+def _obter_taxa_cartao(n: int, score: int) -> float:
+    if n <= 6:
+        return TAXAS_CARTAO["max_6_score_alto"] if score >= SCORE_ALTO else TAXAS_CARTAO["max_6_score_baixo"]
+    return TAXAS_CARTAO["acima_6_score_alto"] if score >= SCORE_ALTO else TAXAS_CARTAO["acima_6_score_baixo"]
+
+
+def _calcular_total(financiado: float, taxa: float, n: int) -> float:
+    if taxa > 0:
+        return financiado * ((1 + taxa) ** n)
+    return financiado
+
+
+def _distribuir_parcelas(total: float, n: int) -> List[float]:
+    valor_parcela = round(total / n, 2)
+    parcelas = [valor_parcela] * n
+    
+    soma = round(valor_parcela * n, 2)
+    diferenca = round(total - soma, 2)
+    
+    if diferenca != 0:
+        parcelas[-1] = round(parcelas[-1] + diferenca, 2)
+        
+    return parcelas
+
+
+def calcular_parcelas(venda: Dict) -> Dict:
+    valor = venda["valor"]
+    entrada = venda.get("entrada", 0)
+    n = venda["parcelas"]
+    forma = venda["forma"]
+    score = venda.get("cliente_score", 0)
+
+    _validar_parcelas(n)
+    _validar_entrada(entrada, valor)
+    
+    financiado = valor - entrada
+    taxa = 0.0
+
+    if forma == "PIX":
+        _validar_entrada_boleto(entrada, valor, n) if False else None # Placeholder, PIX não tem validação de entrada mínima extra além da geral
+        financiado = _calcular_desconto_pix(financiado, valor)
+        n = 1
+        taxa = 0.0
+    elif forma == "BOLETO":
+        _validar_entrada_boleto(entrada, valor, n)
+        taxa = _obter_taxa_boleto(n)
+    elif forma == "CARTAO":
+        taxa = _obter_taxa_cartao(n, score)
+    else:
+        raise ValueError("forma invalida")
+
+    total = _calcular_total(financiado, taxa, n)
+    total = round(total, 2)
+    
+    parcelas = _distribuir_parcelas(total, n)
+
+    return {
+        "forma": forma,
+        "financiado": round(financiado, 2),
+        "taxa_mensal": taxa,
+        "parcelas": parcelas,
+        "total_final": round(entrada + total, 2),
+        "juros_total": round(total - financiado, 2)
+    }
+```

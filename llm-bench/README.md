@@ -8,6 +8,7 @@ cd /srv/pases/llm-bench
 ./bench_llm.py --validar                         # confere as fixtures contra as solucoes de referencia (nao chama o modelo)
 ./bench_llm.py --modelo qwen-cline --reps 3      # roda tudo; precisa do Ollama no ar e do ComfyUI parado (VRAM livre)
 ./bench_llm.py --modelo qwen-cline --reps 5 --refatoracao   # so o item 2, nas 3 fixtures de refatoracao
+BENCH_THINK=off ./bench_llm.py --modelo qwen38-bench --reps 3   # modelos com raciocinio (ex.: Qwen3.8): off/on forca o modo; sem a variavel vale o padrao do modelo
 ```
 
 Ambiente de teste (pytest, venv proprio; fora do Git): `uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python pytest`.

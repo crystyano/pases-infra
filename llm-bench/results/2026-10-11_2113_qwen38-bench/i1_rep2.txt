@@ -1,0 +1,103 @@
+```python
+from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
+
+CENTAVOS = Decimal("0.01")
+
+
+def _round(value: Decimal) -> Decimal:
+    return value.quantize(CENTAVOS, rounding=ROUND_HALF_UP)
+
+
+@dataclass(frozen=True)
+class Item:
+    descricao: str
+    quantidade: int
+    preco_unitario: Decimal
+
+
+class Orcamento:
+    def __init__(self, cliente: str, frete: Decimal = Decimal("0")) -> None:
+        if not isinstance(cliente, str):
+            raise ValueError("cliente deve ser uma string")
+        cliente = cliente.strip()
+        if not cliente:
+            raise ValueError("cliente não pode ser vazio")
+        if not isinstance(frete, Decimal):
+            raise ValueError("frete deve ser um Decimal")
+        if frete < 0:
+            raise ValueError("frete não pode ser negativo")
+        self._cliente: str = cliente
+        self._frete: Decimal = frete
+        self._itens: list[tuple[str, int, Decimal]] = []
+        self._desconto_percentual: Decimal = Decimal("0")
+
+    def adicionar_item(self, item: Item) -> None:
+        if not isinstance(item, Item):
+            raise ValueError("item inválido")
+        if not isinstance(item.descricao, str):
+            raise ValueError("descricao deve ser uma string")
+        descricao = item.descricao.strip()
+        if not descricao:
+            raise ValueError("descricao não pode ser vazia")
+        if not isinstance(item.quantidade, int) or isinstance(item.quantidade, bool):
+            raise ValueError("quantidade deve ser um int")
+        if item.quantidade <= 0:
+            raise ValueError("quantidade deve ser maior que zero")
+        if not isinstance(item.preco_unitario, Decimal):
+            raise ValueError("preco_unitario deve ser um Decimal")
+        if item.preco_unitario < 0:
+            raise ValueError("preco_unitario não pode ser negativo")
+
+        chave = descricao.lower()
+        for i, (desc, qtd, preco) in enumerate(self._itens):
+            if desc.lower() == chave:
+                if preco != item.preco_unitario:
+                    raise ValueError("preço unitário divergente para a mesma descrição")
+                self._itens[i] = (desc, qtd + item.quantidade, preco)
+                return
+        self._itens.append((descricao, item.quantidade, item.preco_unitario))
+
+    def subtotal(self) -> Decimal:
+        total = Decimal("0")
+        for _, qtd, preco in self._itens:
+            total += qtd * preco
+        return _round(total)
+
+    def aplicar_desconto(self, percentual: Decimal, aprovado: bool = False) -> None:
+        if not isinstance(percentual, Decimal):
+            raise ValueError("percentual deve ser um Decimal")
+        if percentual < 0 or percentual > 100:
+            raise ValueError("percentual deve estar entre 0 e 100")
+        if percentual > Decimal("15") and not aprovado:
+            raise PermissionError("desconto acima de 15% requer aprovação")
+        self._desconto_percentual = percentual
+
+    def total(self) -> Decimal:
+        return _round(self.subtotal() - self._valor_desconto() + self._frete)
+
+    def _valor_desconto(self) -> Decimal:
+        if self._desconto_percentual == 0:
+            return Decimal("0")
+        return _round(self.subtotal() * self._desconto_percentual / Decimal("100"))
+
+    def to_dict(self) -> dict:
+        itens = []
+        for desc, qtd, preco in self._itens:
+            itens.append({
+                "descricao": desc,
+                "quantidade": qtd,
+                "preco_unitario": str(_round(preco)),
+                "subtotal": str(_round(qtd * preco)),
+            })
+        desconto_percentual = self._desconto_percentual
+        return {
+            "cliente": self._cliente,
+            "itens": itens,
+            "subtotal": str(self.subtotal()),
+            "desconto_percentual": str(_round(desconto_percentual)),
+            "desconto_valor": str(self._valor_desconto()),
+            "frete": str(_round(self._frete)),
+            "total": str(self.total()),
+        }
+```

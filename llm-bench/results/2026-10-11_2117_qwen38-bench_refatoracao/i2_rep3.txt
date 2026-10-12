@@ -1,0 +1,119 @@
+```python
+"""Módulo de cálculo de pedidos."""
+
+# Tabela de fretes: {faixa_de_peso: {uf: valor}}
+# Faixas: "ate_5", "ate_20", "acima_20"
+TABELA_FRETE = {
+    "ate_5": {"SP": 20, "OUTROS": 35},
+    "ate_20": {"SP": 45, "OUTROS": 70},
+    "acima_20": {"SP": 90, "OUTROS": 140},
+}
+
+# Alíquotas de imposto por UF
+ALIQ_IMPOSTO = {
+    "SP": 0.18,
+    "RJ": 0.20,
+    "MG": 0.18,
+    "OUTROS": 0.12,
+}
+
+# Descontos VIP
+DESCONTO_VIP = {
+    "subtotal_min_1000": 0.05,
+    "subtotal_min_500": 0.02,
+}
+
+# Cupons
+CUPOM_FRETEGRATIS = "FRETEGRATIS"
+CUPOM_BEMVINDO10 = "BEMVINDO10"
+
+
+def _calcular_subtotal_e_peso(itens):
+    """Calcula subtotal e peso total a partir dos itens."""
+    subtotal = sum(item["preco"] * item["qtd"] for item in itens)
+    peso = sum(item["peso_kg"] * item["qtd"] for item in itens)
+    return round(subtotal, 2), round(peso, 2)
+
+
+def _calcular_frete(peso, uf, tipo_cliente, cupom):
+    """Calcula o frete com base em peso, UF, tipo de cliente e cupom."""
+    # Determina a faixa de peso
+    if peso <= 5:
+        faixa = "ate_5"
+    elif peso <= 20:
+        faixa = "ate_20"
+    else:
+        faixa = "acima_20"
+
+    # Obtenha o valor base do frete
+    if uf == "SP":
+        frete = TABELA_FRETE[faixa]["SP"]
+    else:
+        frete = TABELA_FRETE[faixa]["OUTROS"]
+
+    # Desconto VIP
+    if tipo_cliente == "VIP":
+        frete *= 0.5
+
+    # Cupom FRETEGRATIS
+    if cupom == CUPOM_FRETEGRATIS:
+        frete = 30 if peso > 50 else 0
+
+    return frete
+
+
+def _calcular_desconto(subtotal, tipo_cliente, cupom):
+    """Calcula o desconto com base em cupom e tipo de cliente."""
+    desconto = 0.0
+
+    # Cupom BEMVINDO10
+    if cupom == CUPOM_BEMVINDO10 and subtotal >= 200:
+        desconto = subtotal * 0.10
+
+    # Desconto VIP (aplicado sobre o valor remanescente)
+    if tipo_cliente == "VIP":
+        if subtotal >= 1000:
+            desconto += (subtotal - desconto) * DESCONTO_VIP["subtotal_min_1000"]
+        elif subtotal >= 500:
+            desconto += (subtotal - desconto) * DESCONTO_VIP["subtotal_min_500"]
+
+    return round(desconto, 2)
+
+
+def _calcular_imposto(base, uf):
+    """Calcula o imposto com base na UF."""
+    aliq = ALIQ_IMPOSTO.get(uf, ALIQ_IMPOSTO["OUTROS"])
+    return round(base * aliq, 2)
+
+
+def calcular_pedido(pedido):
+    """
+    Calcula os valores de um pedido.
+
+    Args:
+        pedido: dict com chaves "itens", "cliente" e opcionalmente "cupom".
+
+    Returns:
+        dict com subtotal, desconto, frete, imposto, total e peso_kg.
+    """
+    itens = pedido["itens"]
+    cliente = pedido["cliente"]
+    cupom = pedido.get("cupom")
+
+    subtotal, peso = _calcular_subtotal_e_peso(itens)
+    frete = _calcular_frete(peso, cliente["uf"], cliente["tipo"], cupom)
+    desconto = _calcular_desconto(subtotal, cliente["tipo"], cupom)
+
+    base = subtotal - desconto
+    imposto = _calcular_imposto(base, cliente["uf"])
+    total = round(base + imposto + frete, 2)
+
+    return {
+        "subtotal": subtotal,
+        "desconto": desconto,
+        "frete": round(frete, 2),
+        "imposto": imposto,
+        "total": total,
+        "peso_kg": peso,
+    }
+```

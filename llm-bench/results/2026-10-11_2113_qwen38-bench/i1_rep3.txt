@@ -1,0 +1,99 @@
+```python
+from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
+
+@dataclass(frozen=True)
+class Item:
+    descricao: str
+    quantidade: int
+    preco_unitario: Decimal
+
+
+class Orcamento:
+    def __init__(self, cliente: str, frete: Decimal = Decimal("0")) -> None:
+        cliente = cliente.strip()
+        if not cliente:
+            raise ValueError("cliente não pode ser vazio")
+        if frete < 0:
+            raise ValueError("frete não pode ser negativo")
+        self.cliente: str = cliente
+        self.frete: Decimal = frete.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        self._itens: list[dict] = []  # {"descricao": str, "quantidade": int, "preco_unitario": Decimal}
+        self._desconto_percentual: Decimal = Decimal("0")
+
+    def adicionar_item(self, item: Item) -> None:
+        # validações
+        if not isinstance(item, Item):
+            raise ValueError("item inválido")
+        descricao = item.descricao.strip()
+        if not descricao:
+            raise ValueError("descricao não pode ser vazia")
+        if not isinstance(item.quantidade, int) or isinstance(item.quantidade, bool) or item.quantidade <= 0:
+            raise ValueError("quantidade deve ser int > 0")
+        if not isinstance(item.preco_unitario, Decimal) or item.preco_unitario < 0:
+            raise ValueError("preco_unitario deve ser Decimal >= 0")
+
+        chave = descricao.lower()
+        for registro in self._itens:
+            if registro["descricao"].lower() == chave:
+                if registro["preco_unitario"] != item.preco_unitario:
+                    raise ValueError("preço unitário divergente para a mesma descrição")
+                registro["quantidade"] += item.quantidade
+                return
+
+        self._itens.append({
+            "descricao": descricao,
+            "quantidade": item.quantidade,
+            "preco_unitario": item.preco_unitario,
+        })
+
+    def subtotal(self) -> Decimal:
+        soma = Decimal("0")
+        for r in self._itens:
+            soma += r["quantidade"] * r["preco_unitario"]
+        return soma.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    def aplicar_desconto(self, percentual: Decimal, aprovado: bool = False) -> None:
+        if not isinstance(percentual, Decimal):
+            raise ValueError("percentual deve ser Decimal")
+        if percentual < 0 or percentual > 100:
+            raise ValueError("percentual fora do intervalo [0, 100]")
+        if percentual > Decimal("15") and not aprovado:
+            raise PermissionError("desconto acima de 15% exige aprovação")
+        self._desconto_percentual = percentual
+
+    def total(self) -> Decimal:
+        sub = self.subtotal()
+        desconto = (sub * self._desconto_percentual / Decimal("100")).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+        t = sub - desconto + self.frete
+        return t.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    def _desconto_valor(self) -> Decimal:
+        sub = self.subtotal()
+        return (sub * self._desconto_percentual / Decimal("100")).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+
+    def to_dict(self) -> dict:
+        q = Decimal("0.01")
+        itens = []
+        for r in self._itens:
+            sub_item = (r["quantidade"] * r["preco_unitario"]).quantize(q, rounding=ROUND_HALF_UP)
+            itens.append({
+                "descricao": r["descricao"],
+                "quantidade": r["quantidade"],
+                "preco_unitario": str(r["preco_unitario"].quantize(q, rounding=ROUND_HALF_UP)),
+                "subtotal": str(sub_item),
+            })
+        return {
+            "cliente": self.cliente,
+            "itens": itens,
+            "subtotal": str(self.subtotal()),
+            "desconto_percentual": str(self._desconto_percentual.quantize(q, rounding=ROUND_HALF_UP)),
+            "desconto_valor": str(self._desconto_valor()),
+            "frete": str(self.frete),
+            "total": str(self.total()),
+        }
+```

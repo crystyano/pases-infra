@@ -1,0 +1,298 @@
+{
+ "modelo": "qwen38-bench",
+ "run": "2026-10-11_2113_qwen38-bench",
+ "parametros_modelfile": [
+  "PARAMETER top_k 20",
+  "PARAMETER top_p 0.8",
+  "PARAMETER draft_num_predict 4",
+  "PARAMETER min_p 0",
+  "PARAMETER num_ctx 32768",
+  "PARAMETER presence_penalty 0",
+  "PARAMETER repeat_penalty 1",
+  "PARAMETER temperature 0.7"
+ ],
+ "opcoes_runner": {
+  "num_predict": 4096
+ },
+ "think": false,
+ "carga_fria": {
+  "carga_s": 6.4,
+  "primeira_resposta_s": 6.7
+ },
+ "ollama_ps": "qwen38-bench:latest    6c0186468d0a    18 GB    100% GPU     32768      llamacpp    4 minutes from now",
+ "ttft_curto_mediana_s": 0.12,
+ "itens": {
+  "i1": [
+   {
+    "geracao": {
+     "ttft_s": 1.22,
+     "tokens": 1146,
+     "tok_s": 69.0,
+     "prompt_tokens": 939,
+     "total_s": 17.8
+    },
+    "teste": {
+     "passou": 23,
+     "total": 23,
+     "fracao": 1.0,
+     "nota": "23 passed in 0.01s",
+     "falhas": 0,
+     "erros": 0
+    }
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.61,
+     "tokens": 987,
+     "tok_s": 71.2,
+     "prompt_tokens": 939,
+     "total_s": 14.5
+    },
+    "teste": {
+     "passou": 22,
+     "total": 23,
+     "fracao": 0.9565217391304348,
+     "nota": "1 failed, 22 passed in 0.01s",
+     "falhas": 1,
+     "erros": 0
+    }
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.67,
+     "tokens": 1021,
+     "tok_s": 72.3,
+     "prompt_tokens": 939,
+     "total_s": 14.8
+    },
+    "teste": {
+     "passou": 23,
+     "total": 23,
+     "fracao": 1.0,
+     "nota": "23 passed in 0.01s",
+     "falhas": 0,
+     "erros": 0
+    }
+   }
+  ],
+  "i2": [
+   {
+    "geracao": {
+     "ttft_s": 1.02,
+     "tokens": 677,
+     "tok_s": 70.6,
+     "prompt_tokens": 691,
+     "total_s": 10.6
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 23,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.29,
+     "tokens": 1549,
+     "tok_s": 64.2,
+     "prompt_tokens": 691,
+     "total_s": 24.4
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 9,
+     "maior_funcao_linhas": 47,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.31,
+     "tokens": 910,
+     "tok_s": 67.7,
+     "prompt_tokens": 691,
+     "total_s": 13.8
+    },
+    "teste": {
+     "passou": 193,
+     "total": 193,
+     "fracao": 1.0,
+     "nota": "193 passed in 0.04s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "ast": {
+     "funcoes": 5,
+     "maior_funcao_linhas": 23,
+     "melhorou_estrutura": true
+    },
+    "ast_original": {
+     "funcoes": 1,
+     "maior_funcao_linhas": 58
+    },
+    "primeiro_erro": ""
+   }
+  ],
+  "i5": [
+   {
+    "geracao": {
+     "ttft_s": 0.4,
+     "tokens": 153,
+     "tok_s": 57.8,
+     "prompt_tokens": 159,
+     "total_s": 3.0
+    },
+    "lucro_correto": true,
+    "margem_correta": true,
+    "em_portugues": true,
+    "linhas": 6,
+    "respeitou_6_linhas": true
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.28,
+     "tokens": 207,
+     "tok_s": 68.3,
+     "prompt_tokens": 159,
+     "total_s": 3.3
+    },
+    "lucro_correto": true,
+    "margem_correta": true,
+    "em_portugues": true,
+    "linhas": 5,
+    "respeitou_6_linhas": true
+   },
+   {
+    "geracao": {
+     "ttft_s": 0.28,
+     "tokens": 167,
+     "tok_s": 69.7,
+     "prompt_tokens": 159,
+     "total_s": 2.7
+    },
+    "lucro_correto": true,
+    "margem_correta": true,
+    "em_portugues": true,
+    "linhas": 5,
+    "respeitou_6_linhas": true
+   }
+  ],
+  "i6": [
+   {
+    "teste": {
+     "passou": 12,
+     "total": 12,
+     "fracao": 1.0,
+     "nota": "12 passed in 0.01s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "visiveis": {
+     "testes": 13,
+     "passou_tudo": true,
+     "nota": "13 passed in 0.01s"
+    },
+    "passos": 5,
+    "terminou": true,
+    "chamadas": {
+     "list_files": 1,
+     "run_tests": 1,
+     "write_file": 4,
+     "read_file": 4
+    },
+    "testou_antes_de_terminar": true,
+    "tokens": 2198,
+    "tempo_s": 32.5,
+    "tok_s_mediana": 75.6
+   },
+   {
+    "teste": {
+     "passou": 12,
+     "total": 12,
+     "fracao": 1.0,
+     "nota": "12 passed in 0.01s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "visiveis": {
+     "testes": 14,
+     "passou_tudo": true,
+     "nota": "14 passed in 0.01s"
+    },
+    "passos": 6,
+    "terminou": true,
+    "chamadas": {
+     "list_files": 1,
+     "run_tests": 1,
+     "write_file": 4,
+     "read_file": 4
+    },
+    "testou_antes_de_terminar": true,
+    "tokens": 2318,
+    "tempo_s": 34.8,
+    "tok_s_mediana": 75.1
+   },
+   {
+    "teste": {
+     "passou": 12,
+     "total": 12,
+     "fracao": 1.0,
+     "nota": "12 passed in 0.01s",
+     "falhas": 0,
+     "erros": 0
+    },
+    "visiveis": {
+     "testes": 13,
+     "passou_tudo": true,
+     "nota": "13 passed in 0.01s"
+    },
+    "passos": 6,
+    "terminou": true,
+    "chamadas": {
+     "list_files": 1,
+     "run_tests": 1,
+     "write_file": 4,
+     "read_file": 4
+    },
+    "testou_antes_de_terminar": true,
+    "tokens": 2286,
+    "tempo_s": 34.5,
+    "tok_s_mediana": 74.8
+   }
+  ]
+ },
+ "recursos": {
+  "vram_pico_mib_por_gpu": {
+   "0": 10022.0,
+   "1": 11822.0
+  },
+  "ram_pico_gb": 18.9,
+  "temp_pico_c": 75.0,
+  "potencia_pico_w": 226
+ }
+}

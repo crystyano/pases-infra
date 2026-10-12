@@ -1,0 +1,101 @@
+```python
+from typing import List, Dict, Any, Tuple
+
+# Constantes para status
+STATUS_INVALIDA = "INVALIDA"
+STATUS_OTIMO = "OTIMO"
+STATUS_BOM = "BOM"
+STATUS_REGULAR = "REGULAR"
+STATUS_RUIM = "RUIM"
+
+# Constantes para limites de aprovação
+LIMITE_INVALIDA = 100.0
+LIMITE_OTIMO = 85.0
+LIMITE_BOM = 70.0
+LIMITE_REGULAR = 50.0
+LIMITE_RUIM = 0.0
+
+# Constantes para prioridade
+PRIORIDADE_ALTA = 1
+PRIORIDADE_PADRAO = 3
+
+
+def calcular_area_chapa(ordem: Dict[str, Any]) -> float:
+    """Calcula a área da chapa."""
+    return ordem["chapa_w"] * ordem["chapa_h"]
+
+
+def calcular_area_pecas(ordem: Dict[str, Any]) -> float:
+    """Calcula a área total das peças."""
+    return sum(p["w"] * p["h"] * p["qtd"] for p in ordem["pecas"])
+
+
+def calcular_aproveitamento(area_chapa: float, area_pecas: float) -> float:
+    """Calcula o percentual de aproveitamento."""
+    if area_chapa <= 0:
+        return 0.0
+    return round((area_pecas / area_chapa) * 100, 1)
+
+
+def definir_status(aproveitamento: float) -> str:
+    """Define o status com base no percentual de aproveitamento."""
+    if aproveitamento > LIMITE_INVALIDA:
+        return STATUS_INVALIDA
+    elif aproveitamento >= LIMITE_OTIMO:
+        return STATUS_OTIMO
+    elif aproveitamento >= LIMITE_BOM:
+        return STATUS_BOM
+    elif aproveitamento >= LIMITE_REGULAR:
+        return STATUS_REGULAR
+    else:
+        return STATUS_RUIM
+
+
+def precisa_revisar(ordem: Dict[str, Any], aproveitamento: float) -> bool:
+    """Verifica se a ordem precisa de revisão."""
+    prioridade = ordem.get("prioridade", PRIORIDADE_PADRAO)
+    return prioridade == PRIORIDADE_ALTA and aproveitamento < LIMITE_BOM
+
+
+def formatar_linha(id_ordem: Any, status: str, aproveitamento: float) -> str:
+    """Formata uma linha do resumo."""
+    return f"{id_ordem} | {status} | {aproveitamento}%"
+
+
+def resumo_producao(ordens: List[Dict[str, Any]]) -> Dict[str, Any]:
+    linhas: List[str] = []
+    revisar: List[Any] = []
+    total_aprov = 0.0
+    contagem = 0
+    dados: List[Tuple[int, float, Any, str, float]] = []
+
+    for o in ordens:
+        area_chapa = calcular_area_chapa(o)
+        area_pecas = calcular_area_pecas(o)
+        aprov = calcular_aproveitamento(area_chapa, area_pecas)
+        status = definir_status(aprov)
+
+        if precisa_revisar(o, aprov):
+            revisar.append(o["id"])
+
+        if status != STATUS_INVALIDA:
+            total_aprov += aprov
+            contagem += 1
+
+        prioridade = o.get("prioridade", PRIORIDADE_PADRAO)
+        dados.append((prioridade, -aprov, o["id"], status, aprov))
+
+    dados.sort()
+
+    for d in dados:
+        linhas.append(formatar_linha(d[2], d[3], d[4]))
+
+    media = round(total_aprov / contagem, 1) if contagem > 0 else 0
+
+    return {
+        "linhas": linhas,
+        "media_aproveitamento": media,
+        "total_ordens": len(ordens),
+        "revisar": revisar
+    }
+```

@@ -1,0 +1,129 @@
+```python
+from typing import Dict, Any
+
+# Constantes de configuração
+LIMITE_PARCELAS_MIN = 1
+LIMITE_PARCELAS_MAX = 12
+FORMAS_PAGAMENTO_VALIDAS = {"PIX", "BOLETO", "CARTAO"}
+TAXA_PIX_ALTA = 0.05
+TAXA_PIX_BAIXA = 0.03
+LIMITE_VALOR_PIX = 1000
+PORCENTAGEM_ENTRADA_BOLETO = 0.2
+LIMITE_PARCELAS_BOLETO = 6
+
+TAXAS_BOLETO = {
+    (1, 3): 0.0,
+    (4, 6): 0.015,
+    (7, 12): 0.025
+}
+
+TAXAS_CARTAO = {
+    (1, 6, True): 0.0,
+    (1, 6, False): 0.0199,
+    (7, 12, True): 0.0199,
+    (7, 12, False): 0.0299
+}
+
+
+def validar_parcelas(n: int) -> None:
+    if n < LIMITE_PARCELAS_MIN or n > LIMITE_PARCELAS_MAX:
+        raise ValueError("parcelas invalidas")
+
+
+def validar_entrada(entrada: float, valor: float) -> None:
+    if entrada < 0 or entrada >= valor:
+        raise ValueError("entrada invalida")
+
+
+def validar_boleto(entrada: float, valor: float, n: int, forma: str) -> None:
+    if forma == "BOLETO" and n > LIMITE_PARCELAS_BOLETO:
+        if entrada < valor * PORCENTAGEM_ENTRADA_BOLETO:
+            raise ValueError("entrada minima")
+
+
+def validar_forma(forma: str) -> None:
+    if forma not in FORMAS_PAGAMENTO_VALIDAS:
+        raise ValueError("forma invalida")
+
+
+def calcular_taxa_pix(valor: float) -> float:
+    if valor >= LIMITE_VALOR_PIX:
+        return TAXA_PIX_ALTA
+    return TAXA_PIX_BAIXA
+
+
+def calcular_taxa_boleto(n: int) -> float:
+    if n <= 3:
+        return 0.0
+    elif n <= 6:
+        return 0.015
+    return 0.025
+
+
+def calcular_taxa_cartao(n: int, score: int) -> float:
+    alta_score = score >= 700
+    if n <= 6:
+        return 0.0 if alta_score else 0.0199
+    else:
+        return 0.0199 if alta_score else 0.0299
+
+
+def calcular_taxa(forma: str, n: int, valor: float, score: int) -> float:
+    if forma == "PIX":
+        return calcular_taxa_pix(valor)
+    elif forma == "BOLETO":
+        return calcular_taxa_boleto(n)
+    elif forma == "CARTAO":
+        return calcular_taxa_cartao(n, score)
+    return 0.0
+
+
+def calcular_total_financiado(financiado: float, taxa: float, n: int) -> float:
+    if taxa > 0:
+        total = financiado * ((1 + taxa) ** n)
+    else:
+        total = financiado
+    return round(total, 2)
+
+
+def calcular_parcelas(venda: Dict[str, Any]) -> Dict[str, Any]:
+    valor = venda["valor"]
+    entrada = venda.get("entrada", 0)
+    n = venda["parcelas"]
+    forma = venda["forma"]
+    score = venda.get("cliente_score", 0)
+
+    validar_parcelas(n)
+    validar_entrada(entrada, valor)
+    validar_boleto(entrada, valor, n, forma)
+    validar_forma(forma)
+
+    financiado = valor - entrada
+
+    if forma == "PIX":
+        taxa = calcular_taxa(forma, n, valor, score)
+        financiado = financiado - financiado * taxa
+        n = 1
+        taxa = 0
+    else:
+        taxa = calcular_taxa(forma, n, valor, score)
+
+    total = calcular_total_financiado(financiado, taxa, n)
+    valor_parcela = round(total / n, 2)
+
+    parcelas = [valor_parcela] * n
+
+    soma = round(valor_parcela * n, 2)
+    diferenca = round(total - soma, 2)
+    if diferenca != 0:
+        parcelas[n - 1] = round(parcelas[n - 1] + diferenca, 2)
+
+    return {
+        "forma": forma,
+        "financiado": round(financiado, 2),
+        "taxa_mensal": taxa,
+        "parcelas": parcelas,
+        "total_final": round(entrada + total, 2),
+        "juros_total": round(total - financiado, 2)
+    }
+```

@@ -1,0 +1,68 @@
+```python
+STATUS_INVALIDA = "INVALIDA"
+STATUS_OTIMO = "OTIMO"
+STATUS_BOM = "BOM"
+STATUS_REGULAR = "REGULAR"
+STATUS_RUIM = "RUIM"
+
+LIMIARES = [
+    (85, STATUS_OTIMO),
+    (70, STATUS_BOM),
+    (50, STATUS_REGULAR),
+    (0, STATUS_RUIM),
+]
+
+
+def _calcular_area_pecas(pecas):
+    return sum(p["w"] * p["h"] * p["qtd"] for p in pecas)
+
+
+def _calcular_aproveitamento(area_chapa, area_pecas):
+    if area_chapa <= 0:
+        return 0
+    return round((area_pecas / area_chapa) * 100, 1)
+
+
+def _determinar_status(aprov):
+    if aprov > 100:
+        return STATUS_INVALIDA
+    for limiar, status in LIMIARES:
+        if aprov >= limiar:
+            return status
+    return STATUS_RUIM
+
+
+def _processar_ordem(o):
+    area_chapa = o["chapa_w"] * o["chapa_h"]
+    area_pecas = _calcular_area_pecas(o["pecas"])
+    aprov = _calcular_aproveitamento(area_chapa, area_pecas)
+    status = _determinar_status(aprov)
+    prioridade = o.get("prioridade", 3)
+    revisar = prioridade == 1 and aprov < 70
+    return {
+        "id": o["id"],
+        "prioridade": prioridade,
+        "aprov": aprov,
+        "status": status,
+        "revisar": revisar,
+    }
+
+
+def _formatar_linha(item):
+    return f"{item['id']} | {item['status']} | {item['aprov']}%"
+
+
+def resumo_producao(ordens):
+    itens = [_processar_ordem(o) for o in ordens]
+    itens_ordenados = sorted(itens, key=lambda x: (x["prioridade"], -x["aprov"], x["id"]))
+    linhas = [_formatar_linha(i) for i in itens_ordenados]
+    revisar = [i["id"] for i in itens if i["revisar"]]
+    validos = [i for i in itens if i["status"] != STATUS_INVALIDA]
+    media = round(sum(i["aprov"] for i in validos) / len(validos), 1) if validos else 0
+    return {
+        "linhas": linhas,
+        "media_aproveitamento": media,
+        "total_ordens": len(ordens),
+        "revisar": revisar,
+    }
+```

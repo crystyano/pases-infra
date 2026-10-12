@@ -1,0 +1,6 @@
+A receita bruta é de R$ 4.850,00.
+Os custos diretos somam R$ 3.200,00 (materiais, mão de obra e frete).
+A comissão do vendedor equivale a R$ 242,50 (5% de 4.850).
+O imposto devido é de R$ 291,00 (6% de 4.850).
+O lucro líquido resulta em R$ 1.116,50 após subtrair todos os custos e encargos.
+A margem líquida é de aproximadamente 23,02% sobre o preço de venda.
