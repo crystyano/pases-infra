@@ -8,6 +8,7 @@ pases:
         text_encoders/
         clip/
     vae: vae/
+    clip_vision: clip_vision/
     loras: loras/
     upscale_models: upscale_models/
     latent_upscale_models: latent_upscale_models/
