@@ -1,0 +1,10 @@
+[Unit]
+Description=Proxy local do Ollama com think=false (Cline + Qwen3.8) - 127.0.0.1:11435
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /srv/pases/ollama-nothink/proxy.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
