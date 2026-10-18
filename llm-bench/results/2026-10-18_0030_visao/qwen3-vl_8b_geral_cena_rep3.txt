@@ -1,0 +1,1 @@
+{"animal": "badger", "quantos_animais": 1, "cenario": "savanna", "quatro_patas": true}

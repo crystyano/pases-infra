@@ -1,0 +1,193 @@
+{
+ "run": "2026-10-18_0038_visao",
+ "opcoes": {
+  "temperature": 0.2,
+  "top_p": 0.8,
+  "num_ctx": 16384,
+  "think": false,
+  "num_predict": 6000
+ },
+ "modelos": {
+  "qwen3-vl:8b": {
+   "carga_s": 2.7,
+   "tarefas": {
+    "i4_nota_fiscal": [
+     {
+      "nota": 0.875,
+      "detalhe": "7/8 campos",
+      "tempo_s": 42.6,
+      "tok_s": 74.3
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "8/8 campos",
+      "tempo_s": 50.3,
+      "tok_s": 73.8
+     },
+     {
+      "nota": 0.875,
+      "detalhe": "7/8 campos",
+      "tempo_s": 76.2,
+      "tok_s": 72.0
+     }
+    ],
+    "i3_armario_erro": [
+     {
+      "nota": 1.0,
+      "detalhe": "erro certo",
+      "tempo_s": 6.6,
+      "tok_s": 77.2
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "erro certo",
+      "tempo_s": 4.9,
+      "tok_s": 77.1
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "erro certo",
+      "tempo_s": 5.3,
+      "tok_s": 77.0
+     }
+    ],
+    "i3_armario_controle": [
+     {
+      "nota": 1.0,
+      "detalhe": "sem falso alarme",
+      "tempo_s": 10.2,
+      "tok_s": 76.9
+     },
+     {
+      "nota": 0.0,
+      "detalhe": "sem JSON",
+      "tempo_s": 83.8,
+      "tok_s": 71.6
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "sem falso alarme",
+      "tempo_s": 21.8,
+      "tok_s": 75.9
+     }
+    ],
+    "i3_gaveteiro_lateral": [
+     {
+      "nota": 1.0,
+      "detalhe": "erro certo",
+      "tempo_s": 5.3,
+      "tok_s": 77.6
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "erro certo",
+      "tempo_s": 3.1,
+      "tok_s": 77.6
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "erro certo",
+      "tempo_s": 4.9,
+      "tok_s": 77.3
+     }
+    ],
+    "geral_grafico": [
+     {
+      "nota": 1.0,
+      "detalhe": "3/3",
+      "tempo_s": 22.8,
+      "tok_s": 76.2
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "3/3",
+      "tempo_s": 18.3,
+      "tok_s": 76.4
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "3/3",
+      "tempo_s": 10.5,
+      "tok_s": 77.2
+     }
+    ],
+    "geral_contagem": [
+     {
+      "nota": 0.0,
+      "detalhe": "sem JSON",
+      "tempo_s": 83.5,
+      "tok_s": 72.0
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "3/3 {\"circulos_vermelhos\": 7, \"quadrados_azuis\": 4, \"triangulos_verdes\": 2}",
+      "tempo_s": 18.8,
+      "tok_s": 76.5
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "3/3 {\"circulos_vermelhos\": 7, \"quadrados_azuis\": 4, \"triangulos_verdes\": 2}",
+      "tempo_s": 12.2,
+      "tok_s": 76.9
+     }
+    ],
+    "geral_texto_pt": [
+     {
+      "nota": 1.0,
+      "detalhe": "similaridade 1.000",
+      "tempo_s": 6.9,
+      "tok_s": 77.6
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "similaridade 1.000",
+      "tempo_s": 5.6,
+      "tok_s": 77.7
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "similaridade 1.000",
+      "tempo_s": 4.0,
+      "tok_s": 77.9
+     }
+    ],
+    "geral_cena": [
+     {
+      "nota": 0.75,
+      "detalhe": "3/4 animal=badger",
+      "tempo_s": 7.9,
+      "tok_s": 77.3
+     },
+     {
+      "nota": 1.0,
+      "detalhe": "4/4 animal=honey badger",
+      "tempo_s": 4.5,
+      "tok_s": 77.6
+     },
+     {
+      "nota": 0.75,
+      "detalhe": "3/4 animal=badger",
+      "tempo_s": 4.8,
+      "tok_s": 77.6
+     }
+    ]
+   },
+   "vram_pico_mib": {
+    "0": 920,
+    "1": 9588
+   },
+   "media_por_tarefa": {
+    "i4_nota_fiscal": 0.917,
+    "i3_armario_erro": 1.0,
+    "i3_armario_controle": 0.667,
+    "i3_gaveteiro_lateral": 1.0,
+    "geral_grafico": 1.0,
+    "geral_contagem": 0.667,
+    "geral_texto_pt": 1.0,
+    "geral_cena": 0.833
+   },
+   "media_geral": 0.885,
+   "tempo_mediano_s": 9.1
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "i4_nota_fiscal": {
+  "emitente": "Marcenaria Bom Encaixe Ltda",
+  "cnpj": "12.345.678/0001-95",
+  "data": "14/10/2026",
+  "numero": "000.123.456",
+  "itens_total": [
+   "2.278,80",
+   "500,00",
+   "389,00"
+  ],
+  "total": "3.167,80"
+ },
+ "i3_armario_erro": {
+  "tem_erro": true,
+  "pistas": [
+   "1900",
+   "1.900",
+   "700"
+  ]
+ },
+ "i3_armario_controle": {
+  "tem_erro": false
+ },
+ "i3_gaveteiro_lateral": {
+  "tem_erro": true,
+  "pistas": [
+   "600",
+   "550"
+  ]
+ },
+ "geral_grafico": {
+  "mes_maior": "Mar",
+  "valor_marco": 160,
+  "valor_fevereiro": 95
+ },
+ "geral_contagem": {
+  "circulos_vermelhos": 7,
+  "quadrados_azuis": 4,
+  "triangulos_verdes": 2
+ },
+ "geral_texto_pt": "A marcenaria entregou três armários de cozinha na última sexta-feira. O cliente elogiou o acabamento em laca fosca, mas pediu ajustes nas dobradiças e na altura da prateleira superior, que ficou 2 cm abaixo do previsto.",
+ "geral_cena": {
+  "imagem": "/srv/pases/comfyui/input/texugo3_n1.png",
+  "animal": [
+   "texugo",
+   "honey badger",
+   "ratel"
+  ],
+  "quantos": 1,
+  "cenario": [
+   "savana",
+   "savanna"
+  ],
+  "quatro_patas": true
+ }
+}

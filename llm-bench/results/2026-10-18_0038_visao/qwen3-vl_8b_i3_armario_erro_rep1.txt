@@ -1,0 +1,1 @@
+{"tem_erro":true,"erro":"Soma das cotas horizontais inferiores (600+600+700=1900) excede a cota total (1800)"}

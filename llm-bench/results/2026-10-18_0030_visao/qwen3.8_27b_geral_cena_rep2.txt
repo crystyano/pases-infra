@@ -1,0 +1,6 @@
+{
+  "animal": "morcego",
+  "quantos_animais": 1,
+  "cenario": "paisagem de savana com céu azul e árvores ao fundo",
+  "quatro_patas": true
+}

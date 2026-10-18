@@ -1,0 +1,1 @@
+{"animal": "tatu-bola", "quantos_animais": 1, "cenario": "caminho de terra em savana com céu azul e árvores ao fundo", "quatro_patas": true}

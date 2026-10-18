@@ -1,0 +1,5 @@
+{
+  "circulos_vermelhos": 7,
+  "quadrados_azuis": 4,
+  "triangulos_verdes": 2
+}

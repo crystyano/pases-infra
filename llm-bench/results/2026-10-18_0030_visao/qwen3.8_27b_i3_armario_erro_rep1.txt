@@ -1,0 +1,1 @@
+{"tem_erro": true, "erro": "Soma das cotas horizontais (600 + 600 + 700 = 1900) não corresponde à cota total de 1800"}
