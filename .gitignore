@@ -14,3 +14,9 @@ tts/
 blender/
 # Ambiente de teste do llm-bench (pytest; reconstruivel pelo llm-bench/README.md)
 llm-bench/.venv/
+# Ambientes de voz novos (venvs e modelos; reconstruiveis pelo tts-config/README.md e Cap. 8A.15)
+tts-qwen/
+tts-chatterbox/
+tts-voxcpm/
+# Cache do Python
+**/__pycache__/
