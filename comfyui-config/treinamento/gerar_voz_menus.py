@@ -22,6 +22,14 @@ TENTATIVAS = 5
 ABERTURA_FALA = ("Bem-vindo ao treinamento do Ardus. Nos próximos capítulos você vai ver, passo a passo, como criar um projeto de móveis planejados: "
                  "do ambiente às medidas, dos materiais ao orçamento, da proposta para o cliente ao caderno executivo da obra. "
                  "Você vai montar uma cozinha do zero, capítulo por capítulo.")
+# Voz propria do responsavel (fora do Git). Terceira gravacao, de 24/10/2026: os primeiros 59 s (sem a parte do
+# alfabeto), com os respiros atenuados (referencia3_limpa.wav), e um trecho limpo com a transcricao exata como guia de entonacao.
+PROPRIA = "/home/pases/Treinamento-video/voz-propria"
+PROPRIA_REF = f"{PROPRIA}/referencia3_limpa.wav"; PROPRIA_TRECHO = f"{PROPRIA}/referencia3_trecho.wav"
+PROPRIA_TRECHO_TXT = "Gostaria que dessa vez o áudio ficasse ainda melhor do que da última vez."
+# grafias que a voz propria acerta melhor (teste de 24/10/2026, conferido pelo Whisper)
+PROPRIA_GRAFIAS = [("quê érre Codes", "quiú ár côudis"), ("quê érre Code", "quiú ár côude")]
+MAPA_FALA = "São catorze capítulos curtos: um para cada aba e um para as barras laterais. Assista em sequência ou vá direto ao que precisa."  # a mesma de montar_treinamento_menus.py
 REF_TXT = open("/home/pases/Treinamento-video/amostras-vozes-novas/texto.txt", encoding="utf-8").read().strip()  # o que a referencia fala
 
 def db(x): return 20 * np.log10(np.sqrt((np.asarray(x, dtype=np.float64) ** 2).mean()) + 1e-12)
@@ -34,6 +42,16 @@ def aparar(w, sr):
         if len(ult): w = w[: min(len(w), (ult[-1] + 3) * f)]
     fi, fo = int(0.005 * sr), int(0.025 * sr)
     w = w.copy(); w[:fi] *= np.linspace(0, 1, fi); w[-fo:] *= np.linspace(1, 0, fo); return w
+
+def aparar_inicio(w, sr):
+    """Corta o som fraco antes da primeira palavra (respiro, estalo); usado com a voz propria.
+    Acha a primeira vogal forte (pico-22 dB) e volta enquanto ainda ha som (acima de pico-50 dB), para nao comer a
+    consoante inicial ("F" de "Fica", "S" de "Selecionar"); o respiro fica antes, separado por um trecho de silencio."""
+    f = int(0.01 * sr); en = np.array([db(w[i:i + f]) for i in range(0, max(1, len(w) - f), f)])
+    if len(en) < 8: return w
+    p = np.percentile(en, 95); k = int(np.argmax(en > p - 22))
+    while k > 0 and en[k - 1] > p - 50: k -= 1
+    w = w[max(0, (k - 3) * f):].copy(); r = int(0.01 * sr); w[:r] *= np.linspace(0, 1, r); return w
 
 def termina_cortada(w, sr):
     f = int(0.03 * sr); en = np.array([db(w[i:i + f]) for i in range(0, len(w) - f, f)])
@@ -48,22 +66,30 @@ def norm(t):
     return [w for w in re.sub(r"[^a-záéíóúâêôãõçà0-9 ]", " ", t).split() if not w.isdigit() and w not in NUMEROS]
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(); ap.add_argument("--caps", nargs="*", type=int); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--caps", nargs="*", type=int)
+    ap.add_argument("--voz", default="narrador", choices=["narrador", "propria"]); a = ap.parse_args()
+    PASTA_VOZ = "voxcpm"; PROMPT_WAV, PROMPT_TXT, REF_WAV = REF, REF_TXT, REF
+    if a.voz == "propria":   # voz do responsavel (23/10/2026), aprovada com respiros atenuados e inicio aparado
+        PASTA_VOZ = "voz-propria3"; PROMPT_WAV, PROMPT_TXT, REF_WAV = PROPRIA_TRECHO, PROPRIA_TRECHO_TXT, PROPRIA_REF
     # carga do modelo (mesmo procedimento de chatterbox_ptbr.py)
     from voxcpm import VoxCPM
     vx = VoxCPM.from_pretrained("openbmb/VoxCPM2", load_denoiser=False); SR = vx.tts_model.sample_rate
     from faster_whisper import WhisperModel
     wm = WhisperModel("small", device="cpu", compute_type="int8")
     rot = json.loads((SRC / "roteiro.json").read_text(encoding="utf-8"))
-    ab = [dict(s, id="P-" + s["id"]) for s in rot["abertura"]["cenas"]]   # abertura do proprio pacote (ja e de treinamento)
+    ab = [dict(s, id="P-" + s["id"]) for s in rot["abertura"]["cenas"]]
+    ab.append({"id": "P-00-MAPA", "narracao": MAPA_FALA})   # v5: fala do mapa do treinamento (fora do roteiro)   # abertura do proprio pacote (ja e de treinamento)
     todos = [(0, "00-abertura", ab)] + \
             [(c["numero"], c["pasta"], c["cenas"]) for c in rot["capitulos"]]
     relatorio = []
     for num, pasta, cenas in todos:
         if a.caps is not None and num not in a.caps: continue
-        d = OUT / "voz" / "voxcpm" / pasta; d.mkdir(parents=True, exist_ok=True)
+        d = OUT / "voz" / PASTA_VOZ / pasta; d.mkdir(parents=True, exist_ok=True)
         for s in cenas:
-            voz = (s.get("narracaoVoz") or s.get("narracao") or "").strip(); ref_txt = (s.get("narracao") or "").strip()
+            voz = (s.get("narracaoVoz") or s.get("narracao") or "").strip()
+            if a.voz == "propria":
+                for x, y in PROPRIA_GRAFIAS: voz = voz.replace(x, y)
+            ref_txt = (s.get("narracao") or "").strip()
             if not voz: continue
             w_out = d / f"{s['id']}.wav"
             if w_out.exists() and (d / f"{s['id']}.json").exists(): continue
@@ -74,9 +100,10 @@ if __name__ == "__main__":
                 melhor = None
                 for tent in range(TENTATIVAS):
                     torch.manual_seed(1000 * tent + i + 7)
-                    bruto = np.asarray(vx.generate(text=f + SUFIXO, prompt_wav_path=REF, prompt_text=REF_TXT, reference_wav_path=REF,
+                    bruto = np.asarray(vx.generate(text=f + SUFIXO, prompt_wav_path=PROMPT_WAV, prompt_text=PROMPT_TXT, reference_wav_path=REF_WAV,
                                                    cfg_value=2.0, inference_timesteps=10), dtype=np.float32)
                     cortada = termina_cortada(bruto, SR); w = aparar(bruto, SR)
+                    if a.voz == "propria": w = aparar_inicio(w, SR)
                     x16 = np.interp(np.arange(0, len(w), SR / 16000), np.arange(len(w)), w).astype(np.float32)
                     hip = " ".join(x.text for x in wm.transcribe(x16, language="pt")[0])
                     sim = difflib.SequenceMatcher(None, norm(fref), norm(hip)).ratio()
@@ -96,7 +123,7 @@ if __name__ == "__main__":
             else: tmp_w.replace(w_out)
             (d / f"{s['id']}.json").write_text(json.dumps(tempos))
         print(pasta, "ok", flush=True)
-    rel = OUT / "voz" / "voxcpm" / "relatorio.json"
+    rel = OUT / "voz" / PASTA_VOZ / "relatorio.json"
     antigo = json.loads(rel.read_text()) if rel.exists() else []
     rel.write_text(json.dumps(antigo + relatorio, ensure_ascii=False, indent=1))
     if relatorio: print("frases:", len(relatorio), "| semelhanca media %.3f" % np.mean([r["semelhanca"] for r in relatorio]),

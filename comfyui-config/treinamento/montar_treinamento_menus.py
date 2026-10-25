@@ -19,6 +19,10 @@ TEAL = "0x07515B"; TEAL_RGB = (7, 81, 91); ACENTO = "0xF2A541"; ACENTO_RGB = (24
 F_BLACK = "/usr/share/fonts/truetype/lato/Lato-Black.ttf"; F_BOLD = "/usr/share/fonts/truetype/lato/Lato-Bold.ttf"; F_REG = "/usr/share/fonts/truetype/lato/Lato-Regular.ttf"
 XF = 0.3; FOLGA = 0.7; ATRASO = 0.35; PAUSA = 0.25; CARTAO = 4.0; VELOCIDADE = 0.85
 GIRO = Path("/home/pases/Treinamento-v3/Treinamento-v3/00-abertura/02-giro.mp4")  # mesma cozinha; o pacote de Propriedades nao traz o giro
+import extras_v5 as X   # v5 (24/10/2026): mapa, temas no cartao, encerramento e musica
+MAPA_FALA = "São catorze capítulos curtos: um para cada aba e um para as barras laterais. Assista em sequência ou vá direto ao que precisa."  # fala a mais, fora do roteiro (v5); a mesma em gerar_voz_menus.py
+FIM_TITULO = "Os menus em resumo"
+CAPS = None; NCAPS = 0; TOPICOS = {}; MAPA_MIN = 8.0; FIM = 5.5
 LOGO = Path(__file__).resolve().parent / "ardus-logo-branco.png"   # logo oficial (branco, fundo transparente), enviado pelo responsavel em 19/10/2026
 
 def sh(cmd):
@@ -72,8 +76,8 @@ def falar_v3(cena, pasta, a):
     global _kok
     txt = (cena.get("narracao") or "").strip()
     if not txt: return None, 0.0, []
-    if a.motor in ("chatterbox", "voxcpm"):
-        w = OUT / "voz" / ("voxcpm" if a.motor == "voxcpm" else "chatterbox-qwen2") / pasta / f"{cena['id']}.wav"; mj = w.with_suffix(".json")
+    if a.motor in ("chatterbox", "voxcpm") or a.motor.startswith("voz-propria"):
+        w = VOZ_BASE / "voz" / ((a.motor if a.motor.startswith("voz-") else {"voxcpm": "voxcpm"}.get(a.motor, "chatterbox-qwen2"))) / pasta / f"{cena['id']}.wav"; mj = w.with_suffix(".json")
         if not w.exists(): sys.exit(f"falta a voz {w} (rode gerar_voz_{a.motor}.py)")
         return w, dur(w), json.loads(mj.read_text())
     d = OUT / "voz" / f"kokoro-{a.voz}-fonemas" / pasta; d.mkdir(parents=True, exist_ok=True); w = d / f"{cena['id']}.wav"
@@ -184,7 +188,7 @@ def assinatura_png(texto, caminho, altura=46):
     d = ImageDraw.Draw(im); d.line([(m + lw + 14, 14), (m + lw + 14, altura + 6)], fill=(230, 240, 240, 160), width=2)
     d.text((m + lw + 28, 10 + int(altura * 0.12)), texto, font=f, fill=(230, 240, 240, 255)); im.save(caminho); return im.size
 
-def cartao(numero, titulo, d, out, tmp, subtitulo="Treinamento para projetistas", giro_ini=0.0):
+def cartao(numero, titulo, d, out, tmp, subtitulo="Treinamento para projetistas", giro_ini=0.0, topicos=None, progresso=None):
     """Cartao de capitulo: trecho desfocado do giro + tinta verde-petroleo; numero grande crescendo; titulo deslizando; linha se desenhando."""
     n = int(round(d * FPS))
     num_png = tmp / "c_num.png"; tit_png = tmp / "c_tit.png"; sub_png = tmp / "c_sub.png"
@@ -203,7 +207,10 @@ def cartao(numero, titulo, d, out, tmp, subtitulo="Treinamento para projetistas"
           f"[a][tit]overlay=x='{x0}-60*max(0,1-(t-0.35)/0.5)':y={yt}[b];"
           f"[b][sub]overlay=x={x0}:y={yt + th + 30}[c];"
           f"[c]drawbox=x={x0 + 20}:y={yt - 8}:w='max(1,{min(tw, 900)}*min(1,max(0,(t-0.5)/0.7)))':h=6:color={ACENTO}:t=fill:enable='gte(t,0.5)'[v]")
-    sh(["ffmpeg", "-v", "error", "-y", "-i", GIRO, "-loop", "1", "-i", num_png, "-loop", "1", "-i", tit_png, "-loop", "1", "-i", sub_png,
+    extra = []
+    if topicos or progresso:   # v5: temas do capitulo e barra "Capitulo N de M"
+        extra, fx = X.camada_cartao(topicos, *(progresso or (None, None)), tmp, 4); fc = fc[:-3] + "[c0];" + fx
+    sh(["ffmpeg", "-v", "error", "-y", "-i", GIRO, "-loop", "1", "-i", num_png, "-loop", "1", "-i", tit_png, "-loop", "1", "-i", sub_png] + extra + [
         "-filter_complex", fc, "-map", "[v]", "-frames:v", n, "-r", FPS, "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", "-an", out])
 
 def letreiro_sobre(src, d, out, texto, tmp, velocidade=1.0, ini=0.0, grande=True, ken=None, cortes=None):
@@ -269,6 +276,8 @@ def capitulo(numero, titulo, pasta, cenas, a, abertura=False):
     durs = []
     for s, (w, f, _) in zip(cenas, falas):
         if s["tipo"] == "titulo": d = CARTAO
+        elif s["tipo"] == "mapa": d = max(MAPA_MIN, ATRASO + f + 1.2)
+        elif s["tipo"] == "fim": d = FIM
         elif abertura and s["id"] in ("00-01", "00-02"): d = ATRASO + f + 1.0
         elif s.get("montagem"): d = max(len(s["montagem"]) * 1.2, ATRASO + f + 0.8)
         elif s["tipo"] == "video": d = max(dur(SRC / s["arquivo"]), ATRASO + f + FOLGA)
@@ -284,7 +293,10 @@ def capitulo(numero, titulo, pasta, cenas, a, abertura=False):
         if s["tipo"] == "titulo":
             if abertura: cartao("LOGO", "Os menus em resumo", d, out, tmp, subtitulo="14 capítulos curtos, aba por aba", giro_ini=2.0)
             else:
-                t = re.sub(r"^\d+\.\s*", "", s["naTela"]); cartao(numero, t, d, out, tmp, giro_ini=(numero * 0.7) % 7)
+                t = re.sub(r"^\d+\.\s*", "", s["naTela"]); cartao(numero, t, d, out, tmp, giro_ini=(numero * 0.7) % 7,
+                                                          topicos=TOPICOS.get(numero), progresso=(numero, NCAPS) if NCAPS else None)
+        elif s["tipo"] == "mapa": X.mapa(s["capitulos"], d, out, tmp)
+        elif s["tipo"] == "fim": X.encerramento(d, out, tmp, s["naTela"])
         elif abertura and s["id"] == "00-01": letreiro_sobre(SRC / s["arquivo"], d, out, "", tmp, cortes=[(0, 3.0), (10.6, 14.0)])  # medido: parado de 3 a 11 s
         elif abertura and s["id"] == "00-02": letreiro_sobre(SRC / s["arquivo"], d, out, "Ardus", tmp, velocidade=1.1)
         elif s.get("montagem"): montagem_rapida(s["montagem"], d, out, tmp, s.get("naTela") or "", rotulos=s.get("rotulos"))
@@ -301,8 +313,10 @@ def capitulo(numero, titulo, pasta, cenas, a, abertura=False):
         if w:
             ent += ["-i", w]; ms = int((inicios[i] + ATRASO) * 1000)
             fc.append(f"[{k}:a]adelay={ms}|{ms},aresample=48000[a{k}]"); aud.append(f"[a{k}]"); k += 1
-    fc.append(f"{''.join(aud)}amix=inputs={len(aud)}:normalize=0,apad=whole_dur={total:.3f},atrim=0:{total:.3f},loudnorm=I=-16:TP=-1.5:LRA=11[ao]")
-    dest = OUT / "capitulos" / f"{pasta}.mp4"; dest.parent.mkdir(parents=True, exist_ok=True)
+    if not aud: ent += ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono"]; aud = [f"[{k}:a]"]   # cena sem fala (encerramento)
+    norm = "" if CAPS else ",loudnorm=I=-16:TP=-1.5:LRA=11"   # v5: o volume e acertado depois, com ganho fixo (extras_v5.trilha)
+    fc.append(f"{''.join(aud)}amix=inputs={len(aud)}:normalize=0,apad=whole_dur={total:.3f},atrim=0:{total:.3f}{norm}[ao]")
+    dest = (CAPS or OUT / "capitulos") / f"{pasta}.mp4"; dest.parent.mkdir(parents=True, exist_ok=True)
     sh(["ffmpeg", "-v", "error", "-y"] + ent + ["-filter_complex", ";".join(fc), "-map", f"[{ult}]" if len(vids) > 1 else "0:v", "-map", "[ao]",
         "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-r", FPS, "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-movflags", "+faststart", dest])
     # legenda: texto de `narracao` (grafia certa), uma entrada por frase, no tempo real de cada frase gerada
@@ -331,16 +345,30 @@ def capitulo(numero, titulo, pasta, cenas, a, abertura=False):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--caps", nargs="*", type=int); ap.add_argument("--motor", default="voxcpm")
-    ap.add_argument("--voz", default="pm_alex"); ap.add_argument("--completo", action="store_true"); a = ap.parse_args()
+    ap.add_argument("--voz", default="pm_alex"); ap.add_argument("--completo", action="store_true")
+    ap.add_argument("--v5", action="store_true", help="mapa, temas no cartao, encerramento e musica (extras_v5)")
+    ap.add_argument("--musica", nargs="*", default=[], help="faixas da trilha (com --v5)"); a = ap.parse_args()
+    VOZ_BASE = OUT
+    if a.motor.startswith("voz-propria"): OUT = OUT / a.motor; OUT.mkdir(exist_ok=True)   # voz do responsavel: capitulos, legendas e video em subpasta propria
     rot = json.loads((SRC / "roteiro.json").read_text(encoding="utf-8"))
     # Abertura do proprio pacote (de treinamento): cartao com o logo e depois o painel em uso, com a fala.
     cenas_ab = {s["id"]: s for s in rot["abertura"]["cenas"]}
     abertura = [dict(cenas_ab["00-02"], id="P-00-02"), dict(cenas_ab["00-01"], id="P-00-01")]
     todos = [(0, "Abertura", "00-abertura", abertura, True)] + \
             [(c["numero"], c["titulo"], c["pasta"], c["cenas"], False) for c in rot["capitulos"]]
+    if a.v5:
+        X.configurar(globals()); CARTAO = 5.5; NCAPS = len(rot["capitulos"])
+        TOPICOS = {c["numero"]: X.topicos_do_capitulo(c["cenas"], c["titulo"]) for c in rot["capitulos"]}
+        # fala a mais (fora do roteiro), gerada por gerar_voz_*.py --voz propria a partir de EXTRAS_V5 (mesmo texto)
+        abertura.append({"id": "P-00-MAPA", "tipo": "mapa", "narracao": MAPA_FALA, "capitulos": [(c["numero"], c["titulo"]) for c in rot["capitulos"]]})
+        todos.append((99, "Encerramento", "99-encerramento", [{"id": "P-99-01", "tipo": "fim", "naTela": FIM_TITULO}], False))
+        CAPS = OUT / "sem-musica" / "capitulos"; CAPS.mkdir(parents=True, exist_ok=True)
     for num, tit, pasta, cenas, ab in todos:
         if a.caps is None or num in a.caps:
             d, t = capitulo(num, tit, pasta, cenas, a, abertura=ab); print(f"{d.name}: {t:.1f} s", flush=True)
+    if a.v5 and a.musica:
+        caps = [CAPS / f"{p}.mp4" for _, _, p, _, _ in todos]; bed = OUT / "tmp" / "trilha_leito.wav"
+        X.leito([Path(m) for m in a.musica], sum(dur(c) for c in caps), bed); X.trilha(caps, bed, OUT / "capitulos")
     if a.completo:
         lst = OUT / "tmp" / "lista.txt"; lst.write_text("".join(f"file '{OUT / 'capitulos' / (p + '.mp4')}'\n" for _, _, p, _, _ in todos))
         fim = OUT / "Ardus_Treinamento_Menus_completo.mp4"
